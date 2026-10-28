@@ -44,7 +44,7 @@ public final class Guard {
         }
         if (safe || crashes >= LIMIT) {
             if (!safe) write(f, crashes + " safe");
-            XposedBridge.log("derealization: безопасный режим — " + pkg + " падал, патч в нём выключен");
+            XposedBridge.log("derealization: safe mode — " + pkg + " kept crashing, patch disabled there");
             return false;
         }
         final int before = crashes;
@@ -68,7 +68,7 @@ public final class Guard {
                 o.write(s.getBytes(StandardCharsets.UTF_8));
             }
         } catch (Throwable t) {
-            XposedBridge.log("derealization: счётчик запусков — " + t);
+            XposedBridge.log("derealization: launch counter — " + t);
         }
     }
 }

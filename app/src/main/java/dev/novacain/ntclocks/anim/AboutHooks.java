@@ -37,7 +37,7 @@ public final class AboutHooks {
     public static void hook(ClassLoader cl) {
         Class<?> pref = XposedHelpers.findClassIfExists("com.nothing.settings.deviceinfo.aboutphone.DeviceInfoPreference", cl);
         if (pref == null) {
-            XposedBridge.log("ntweaker: «О телефоне» — не найдено");
+            XposedBridge.log("derealization: About phone — not found");
             return;
         }
         Hook.all(pref, "o0", new XC_MethodHook() {
@@ -52,11 +52,11 @@ public final class AboutHooks {
                     }
                     replace(ctx, p.args[0]);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: «О телефоне» — " + t);
+                    XposedBridge.log("derealization: About phone — " + t);
                 }
             }
         });
-        XposedBridge.log("ntweaker: «О телефоне» подключено");
+        XposedBridge.log("derealization: About phone hooked");
     }
 
     private static View find(Object holder, Context ctx, String name) {

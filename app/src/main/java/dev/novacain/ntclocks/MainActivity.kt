@@ -247,11 +247,11 @@ internal fun ClocksTab() {
         Preview(id, prefs, version, aod) { change -> update(change) }
         Spacer(Modifier.height(10.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Как в Always-on", style = t(15), modifier = Modifier.weight(1f))
+            Text(s(R.string.clock_as_aod), style = t(15), modifier = Modifier.weight(1f))
             Toggle(aod) { aod = it }
         }
         Spacer(Modifier.height(10.dp))
-        SubTabs(listOf("Выбор", "Настройка"), sub) { sub = it }
+        SubTabs(listOf(s(R.string.clock_tab_choose), s(R.string.clock_tab_adjust)), sub) { sub = it }
         if (sub == 0) {
         Spacer(Modifier.height(8.dp))
         Clocks.OWN.toList().chunked(3).forEachIndexed { row, ids ->
@@ -265,108 +265,108 @@ internal fun ClocksTab() {
 
         if (id != Clocks.DOTS && id != Clocks.ANALOG) {
             Spacer(Modifier.height(14.dp))
-            Text("ШРИФТ", style = mono())
+            Text(s(R.string.clock_font_label), style = mono())
             Spacer(Modifier.height(8.dp))
             FontStrip(prefs.font) { v -> update { font = v } }
         }
 
         Spacer(Modifier.height(12.dp))
         val isApplied = applied == id
-        Button(if (isApplied) "Стоит на экране блокировки" else "Поставить на экран блокировки", primary = !isApplied) {
+        Button(if (isApplied) s(R.string.clock_applied) else s(R.string.clock_apply), primary = !isApplied) {
             if (canApply(ctx)) { applyClock(ctx, id); applied = currentClock(ctx) }
         }
         if (!canApply(ctx)) {
             Text(
-                "Чтобы приложение могло менять часы, один раз выдай доступ:\nadb shell pm grant dev.novacain.ntclocks android.permission.WRITE_SECURE_SETTINGS",
+                s(R.string.clock_grant_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 8.dp)
             )
         }
         if (applied != null && Clocks.isOurs(applied!!)) {
             Spacer(Modifier.height(8.dp))
-            Button("Вернуть часы Nothing", primary = false) {
+            Button(s(R.string.clock_restore), primary = false) {
                 if (canApply(ctx)) { restoreNothing(ctx); applied = currentClock(ctx) }
             }
         }
 
         } else {
-        Group("Общие") {
-            SliderRow("Размер", prefs.size, 0.5f..2.5f, { "${(it * 100).toInt()}%" }) { v -> update { size = v } }
-            SliderRow("Сдвиг по горизонтали", prefs.offsetX, -120f..120f, { "${it.toInt()} dp" }) { v -> update { offsetX = v } }
-            SliderRow("Сдвиг по вертикали", prefs.offsetY, 0f..200f, { "${it.toInt()} dp" }) { v -> update { offsetY = v } }
+        Group(s(R.string.clock_general)) {
+            SliderRow(s(R.string.clock_size), prefs.size, 0.5f..2.5f, { "${(it * 100).toInt()}%" }) { v -> update { size = v } }
+            SliderRow(s(R.string.clock_offset_x), prefs.offsetX, -120f..120f, { "${it.toInt()} dp" }) { v -> update { offsetX = v } }
+            SliderRow(s(R.string.clock_offset_y), prefs.offsetY, 0f..200f, { "${it.toInt()} dp" }) { v -> update { offsetY = v } }
             val crd = Clocks.isCrd(id)
             if (!crd) {
-                Label("Выравнивание")
-                Segmented(listOf("Как в системе", "Слева", "Центр", "Справа"), prefs.align) { v -> update { align = v } }
+                Label(s(R.string.clock_align))
+                Segmented(listOf(s(R.string.as_system), s(R.string.clock_align_left), s(R.string.clock_align_center), s(R.string.clock_align_right)), prefs.align) { v -> update { align = v } }
             }
-            Label("Цвет")
-            Segmented(listOf("По обоям", "Акцент обоев", "Свой"), prefs.colorMode) { v -> update { colorMode = v } }
+            Label(s(R.string.clock_color))
+            Segmented(listOf(s(R.string.clock_color_wallpaper), s(R.string.clock_color_accent), s(R.string.clock_color_custom)), prefs.colorMode) { v -> update { colorMode = v } }
             if (prefs.colorMode == ClockPrefs.COLOR_CUSTOM || id == Clocks.ANALOG) {
                 Palette(prefs.customColor) { v -> update { customColor = v } }
             }
             if (!crd) {
-                SwitchRow("Секунды", prefs.seconds) { v -> update { seconds = v } }
-                Label("Формат")
-                Segmented(listOf("Как в системе", "12 ч", "24 ч"), prefs.hourFormat) { v -> update { hourFormat = v } }
-                SwitchRow("Ноль перед часом (09:41)", prefs.leadingZero) { v -> update { leadingZero = v } }
+                SwitchRow(s(R.string.clock_seconds), prefs.seconds) { v -> update { seconds = v } }
+                Label(s(R.string.clock_format))
+                Segmented(listOf(s(R.string.as_system), s(R.string.clock_12h), s(R.string.clock_24h)), prefs.hourFormat) { v -> update { hourFormat = v } }
+                SwitchRow(s(R.string.clock_leading_zero), prefs.leadingZero) { v -> update { leadingZero = v } }
             }
-            SwitchRow("Скрыть дату Nothing над часами", prefs.hideSystemDate) { v -> update { hideSystemDate = v } }
-            SliderRow("Яркость в Always-on", prefs.aodBrightness, 0.2f..1f, { "${(it * 100).toInt()}%" }) { v -> update { aodBrightness = v } }
-            if (!crd) SwitchRow("Контуром в Always-on", prefs.aodOutline) { v -> update { aodOutline = v } }
+            SwitchRow(s(R.string.clock_hide_date), prefs.hideSystemDate) { v -> update { hideSystemDate = v } }
+            SliderRow(s(R.string.clock_aod_brightness), prefs.aodBrightness, 0.2f..1f, { "${(it * 100).toInt()}%" }) { v -> update { aodBrightness = v } }
+            if (!crd) SwitchRow(s(R.string.clock_aod_outline), prefs.aodOutline) { v -> update { aodOutline = v } }
         }
 
         when (id) {
             Clocks.DOTS -> {
-                Group("Точки") {
-                    SliderRow("Размер точки", prefs.dotSize, 0.3f..1f, { "${(it * 100).toInt()}%" }) { v -> update { dotSize = v } }
-                    SliderRow("Шаг между точками", prefs.dotSpacing, 0.6f..2f, { "×%.2f".format(it) }) { v -> update { dotSpacing = v } }
-                    SliderRow("Свечение", prefs.dotGlow, 0f..1f, { "${(it * 100).toInt()}%" }) { v -> update { dotGlow = v } }
-                    SwitchRow("Квадратные точки", prefs.dotSquare) { v -> update { dotSquare = v } }
-                    SwitchRow("Погашенные точки", prefs.dotGhost) { v -> update { dotGhost = v } }
+                Group(s(R.string.clock_dots)) {
+                    SliderRow(s(R.string.clock_dot_size), prefs.dotSize, 0.3f..1f, { "${(it * 100).toInt()}%" }) { v -> update { dotSize = v } }
+                    SliderRow(s(R.string.clock_dot_pitch), prefs.dotSpacing, 0.6f..2f, { "×%.2f".format(it) }) { v -> update { dotSpacing = v } }
+                    SliderRow(s(R.string.clock_glow), prefs.dotGlow, 0f..1f, { "${(it * 100).toInt()}%" }) { v -> update { dotGlow = v } }
+                    SwitchRow(s(R.string.clock_square_dots), prefs.dotSquare) { v -> update { dotSquare = v } }
+                    SwitchRow(s(R.string.clock_unlit_dots), prefs.dotGhost) { v -> update { dotGhost = v } }
                 }
             }
             Clocks.STRETCH -> {
-                Group("Растяг") {
-                    SliderRow("По высоте", prefs.stretchY, 0.6f..3.5f, { "×%.2f".format(it) }) { v -> update { stretchY = v } }
-                    SliderRow("По ширине", prefs.stretchX, 0.5f..1.6f, { "×%.2f".format(it) }) { v -> update { stretchX = v } }
-                    SliderRow("Толщина", prefs.weight.toFloat(), 100f..900f, { it.toInt().toString() }) { v -> update { weight = v.toInt() } }
-                    SwitchRow("Часы над минутами", prefs.stacked) { v -> update { stacked = v } }
-                    SliderRow("Зазор между строками", prefs.lineGap, -0.3f..0.6f, { "%.2f".format(it) }) { v -> update { lineGap = v } }
-                    SliderRow("Разрядка", prefs.letterSpacing, -0.15f..0.5f, { "%.2f".format(it) }) { v -> update { letterSpacing = v } }
+                Group(s(R.string.clock_stretch)) {
+                    SliderRow(s(R.string.clock_by_height), prefs.stretchY, 0.6f..3.5f, { "×%.2f".format(it) }) { v -> update { stretchY = v } }
+                    SliderRow(s(R.string.clock_by_width), prefs.stretchX, 0.5f..1.6f, { "×%.2f".format(it) }) { v -> update { stretchX = v } }
+                    SliderRow(s(R.string.clock_weight), prefs.weight.toFloat(), 100f..900f, { it.toInt().toString() }) { v -> update { weight = v.toInt() } }
+                    SwitchRow(s(R.string.clock_stacked), prefs.stacked) { v -> update { stacked = v } }
+                    SliderRow(s(R.string.clock_line_gap), prefs.lineGap, -0.3f..0.6f, { "%.2f".format(it) }) { v -> update { lineGap = v } }
+                    SliderRow(s(R.string.clock_tracking), prefs.letterSpacing, -0.15f..0.5f, { "%.2f".format(it) }) { v -> update { letterSpacing = v } }
                 }
             }
             Clocks.IOS -> {
                 Group("iOS") {
-                    SliderRow("Толщина", prefs.weight.toFloat(), 100f..900f, { it.toInt().toString() }) { v -> update { weight = v.toInt() } }
-                    SliderRow("Растяг по высоте", prefs.stretchY, 0.8f..2.6f, { "×%.2f".format(it) }) { v -> update { stretchY = v } }
-                    SliderRow("По ширине", prefs.stretchX, 0.6f..1.4f, { "×%.2f".format(it) }) { v -> update { stretchX = v } }
-                    SwitchRow("Жидкое стекло", prefs.glass) { v -> update { glass = v } }
-                    SliderRow("Разрядка", prefs.letterSpacing, -0.1f..0.3f, { "%.2f".format(it) }) { v -> update { letterSpacing = v } }
+                    SliderRow(s(R.string.clock_weight), prefs.weight.toFloat(), 100f..900f, { it.toInt().toString() }) { v -> update { weight = v.toInt() } }
+                    SliderRow(s(R.string.clock_stretch_height), prefs.stretchY, 0.8f..2.6f, { "×%.2f".format(it) }) { v -> update { stretchY = v } }
+                    SliderRow(s(R.string.clock_by_width), prefs.stretchX, 0.6f..1.4f, { "×%.2f".format(it) }) { v -> update { stretchX = v } }
+                    SwitchRow(s(R.string.clock_liquid_glass), prefs.glass) { v -> update { glass = v } }
+                    SliderRow(s(R.string.clock_tracking), prefs.letterSpacing, -0.1f..0.3f, { "%.2f".format(it) }) { v -> update { letterSpacing = v } }
                 }
             }
             Clocks.COLOROS -> {
                 Group("ColorOS") {
-                    SliderRow("Толщина", prefs.weight.toFloat(), 100f..900f, { it.toInt().toString() }) { v -> update { weight = v.toInt() } }
-                    SwitchRow("Два тона", prefs.twoTone) { v -> update { twoTone = v } }
-                    SwitchRow("Дата рядом с минутами", prefs.showDate) { v -> update { showDate = v } }
-                    SliderRow("Растяг по высоте", prefs.stretchY, 0.8f..2.6f, { "×%.2f".format(it) }) { v -> update { stretchY = v } }
-                    SliderRow("Зазор между строками", prefs.lineGap, -0.2f..0.6f, { "%.2f".format(it) }) { v -> update { lineGap = v } }
+                    SliderRow(s(R.string.clock_weight), prefs.weight.toFloat(), 100f..900f, { it.toInt().toString() }) { v -> update { weight = v.toInt() } }
+                    SwitchRow(s(R.string.clock_two_tone), prefs.twoTone) { v -> update { twoTone = v } }
+                    SwitchRow(s(R.string.clock_date_by_minutes), prefs.showDate) { v -> update { showDate = v } }
+                    SliderRow(s(R.string.clock_stretch_height), prefs.stretchY, 0.8f..2.6f, { "×%.2f".format(it) }) { v -> update { stretchY = v } }
+                    SliderRow(s(R.string.clock_line_gap), prefs.lineGap, -0.2f..0.6f, { "%.2f".format(it) }) { v -> update { lineGap = v } }
                 }
             }
             Clocks.ORIGIN -> {
                 Group("Origin") {
-                    SliderRow("Толщина", prefs.weight.toFloat(), 100f..600f, { it.toInt().toString() }) { v -> update { weight = v.toInt() } }
-                    SwitchRow("Дата между часами и минутами", prefs.showDate) { v -> update { showDate = v } }
-                    SliderRow("Растяг по высоте", prefs.stretchY, 0.8f..2.6f, { "×%.2f".format(it) }) { v -> update { stretchY = v } }
-                    SliderRow("Разрядка", prefs.letterSpacing, -0.1f..0.3f, { "%.2f".format(it) }) { v -> update { letterSpacing = v } }
+                    SliderRow(s(R.string.clock_weight), prefs.weight.toFloat(), 100f..600f, { it.toInt().toString() }) { v -> update { weight = v.toInt() } }
+                    SwitchRow(s(R.string.clock_date_between), prefs.showDate) { v -> update { showDate = v } }
+                    SliderRow(s(R.string.clock_stretch_height), prefs.stretchY, 0.8f..2.6f, { "×%.2f".format(it) }) { v -> update { stretchY = v } }
+                    SliderRow(s(R.string.clock_tracking), prefs.letterSpacing, -0.1f..0.3f, { "%.2f".format(it) }) { v -> update { letterSpacing = v } }
                 }
             }
             Clocks.ANALOG -> {
-                Group("Стрелки") {
-                    Label("Метки")
-                    Segmented(listOf("Нет", "4", "12", "60"), prefs.ticks) { v -> update { ticks = v } }
-                    SliderRow("Толщина стрелок", prefs.handWidth, 0.4f..2.5f, { "×%.2f".format(it) }) { v -> update { handWidth = v } }
-                    SwitchRow("Кольцо", prefs.dialRing) { v -> update { dialRing = v } }
-                    SwitchRow("Секундная — акцентом", prefs.accentSecond) { v -> update { accentSecond = v } }
+                Group(s(R.string.clock_hands)) {
+                    Label(s(R.string.clock_marks))
+                    Segmented(listOf(s(R.string.none), "4", "12", "60"), prefs.ticks) { v -> update { ticks = v } }
+                    SliderRow(s(R.string.clock_hand_weight), prefs.handWidth, 0.4f..2.5f, { "×%.2f".format(it) }) { v -> update { handWidth = v } }
+                    SwitchRow(s(R.string.clock_ring), prefs.dialRing) { v -> update { dialRing = v } }
+                    SwitchRow(s(R.string.clock_accent_seconds), prefs.accentSecond) { v -> update { accentSecond = v } }
                 }
             }
         }
@@ -441,7 +441,7 @@ private fun Preview(id: String, prefs: ClockPrefs, version: Int, aod: Boolean, o
                 contentAlignment = Alignment.Center
             ) { Box(Modifier.size(width = 44.dp, height = 6.dp).clip(CircleShape).background(Accent)) }
             Text(
-                if (stretchable) "тяни язычок · двумя пальцами — размер" else "тяни язычок или двумя пальцами — размер",
+                if (stretchable) s(R.string.clock_drag_hint_stretch) else s(R.string.clock_drag_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(bottom = 14.dp)
             )
         }

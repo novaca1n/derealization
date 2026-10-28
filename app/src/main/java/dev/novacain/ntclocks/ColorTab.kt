@@ -49,11 +49,11 @@ private const val K_PALETTE = "android.theme.customization.system_palette"
 private const val K_ACCENT = "android.theme.customization.accent_color"
 
 /** Палитры Material You: id, подпись, (светлый, тёмный) тон для образца. */
-private val PALETTES = listOf(
-    Triple("a1", "Основная", android.R.color.system_accent1_200 to android.R.color.system_accent1_700),
-    Triple("a2", "Вторая", android.R.color.system_accent2_200 to android.R.color.system_accent2_700),
-    Triple("a3", "Третья", android.R.color.system_accent3_200 to android.R.color.system_accent3_700),
-    Triple("n2", "Серая", android.R.color.system_neutral2_200 to android.R.color.system_neutral2_700),
+private val PALETTES get() = listOf(
+    Triple("a1", s(R.string.palette_primary), android.R.color.system_accent1_200 to android.R.color.system_accent1_700),
+    Triple("a2", s(R.string.palette_secondary), android.R.color.system_accent2_200 to android.R.color.system_accent2_700),
+    Triple("a3", s(R.string.palette_tertiary), android.R.color.system_accent3_200 to android.R.color.system_accent3_700),
+    Triple("n2", s(R.string.palette_neutral), android.R.color.system_neutral2_200 to android.R.color.system_neutral2_700),
 )
 
 private fun readTheme(ctx: android.content.Context): JSONObject =
@@ -66,9 +66,9 @@ private fun writeTheme(ctx: android.content.Context, change: JSONObject.() -> Un
 }
 
 /** Виды адаптивной перекраски — стили системного Material You (имена — как их понимает ThemeOverlayController). */
-private val KINDS = listOf(
-    "TONAL_SPOT" to "Спокойный", "VIBRANT" to "Яркий", "EXPRESSIVE" to "Выразительный",
-    "FRUIT_SALAD" to "Фруктовый", "RAINBOW" to "Радуга",
+private val KINDS get() = listOf(
+    "TONAL_SPOT" to s(R.string.kind_tonal), "VIBRANT" to s(R.string.kind_vibrant), "EXPRESSIVE" to s(R.string.kind_expressive),
+    "FRUIT_SALAD" to s(R.string.kind_fruit), "RAINBOW" to s(R.string.kind_rainbow),
 )
 
 /**
@@ -97,17 +97,17 @@ internal fun ColorTab() {
     }
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
-        Group("Перекраска") {
+        Group(s(R.string.color_recolor)) {
             Spacer(Modifier.height(10.dp))
-            Segmented(listOf("Стоковый", "Адаптивный"), if (on) 1 else 0) { setAdaptive(it == 1) }
+            Segmented(listOf(s(R.string.color_stock), s(R.string.color_adaptive)), if (on) 1 else 0) { setAdaptive(it == 1) }
             Text(
-                if (on) "Цвета берутся из обоев и обновляются сами, когда ставишь новые обои."
-                else "Как у Nothing: чёрно-бело-серый интерфейс.",
+                if (on) s(R.string.color_adaptive_hint)
+                else s(R.string.color_stock_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 8.dp)
             )
         }
         if (on) {
-            Group("Вид") {
+            Group(s(R.string.color_kind)) {
                 val ids = listOf(
                     android.R.color.system_accent1_200, android.R.color.system_accent1_500, android.R.color.system_accent2_300,
                     android.R.color.system_accent3_300, android.R.color.system_neutral2_500, android.R.color.system_neutral2_800,
@@ -141,9 +141,9 @@ internal fun NavCard() {
         val saved = n
         Save.later("nav", 120) { runCatching { NavPrefs.write(cr, saved) } }
     }
-    Group("Полоска жестов") {
+    Group(s(R.string.nav_title)) {
         Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("Внизу экрана: цвет, длина и толщина", style = t(12, c = Dim), modifier = Modifier.weight(1f).padding(end = 12.dp))
+            Text(s(R.string.nav_hint), style = t(12, c = Dim), modifier = Modifier.weight(1f).padding(end = 12.dp))
             Toggle(n.enabled) { v -> update { enabled = v } }
         }
         if (n.enabled) {
@@ -157,16 +157,16 @@ internal fun NavCard() {
                 }
                 Box(Modifier.width(n.width.dp * 0.8f).height(n.thickness.dp).clip(RoundedCornerShape(50)).background(Color(c).copy(alpha = n.opacity)))
             }
-            Text("Цвет", style = t(15), modifier = Modifier.padding(top = 12.dp, bottom = 8.dp))
+            Text(s(R.string.clock_color), style = t(15), modifier = Modifier.padding(top = 12.dp, bottom = 8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 PaletteChip("Nothing", android.R.color.white to android.R.color.black, n.color == "system", Modifier.weight(1f)) { update { color = "system" } }
                 PALETTES.take(3).forEach { (pid, label, res) ->
                     PaletteChip(label, res, n.color == pid, Modifier.weight(1f)) { update { color = pid } }
                 }
             }
-            SliderRow("Длина", n.width, 60f..260f, { "${it.roundToInt()} dp" }) { v -> update { width = v } }
-            SliderRow("Толщина", n.thickness, 2f..8f, { "%.1f dp".format(it) }) { v -> update { thickness = v } }
-            SliderRow("Непрозрачность", n.opacity, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { opacity = v } }
+            SliderRow(s(R.string.nav_length), n.width, 60f..260f, { "${it.roundToInt()} dp" }) { v -> update { width = v } }
+            SliderRow(s(R.string.clock_weight), n.thickness, 2f..8f, { "%.1f dp".format(it) }) { v -> update { thickness = v } }
+            SliderRow(s(R.string.nav_opacity), n.opacity, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { opacity = v } }
         }
     }
 }

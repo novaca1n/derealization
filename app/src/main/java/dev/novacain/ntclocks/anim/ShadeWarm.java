@@ -29,7 +29,7 @@ public final class ShadeWarm {
         Class<?> wc = XposedHelpers.findClassIfExists("com.android.systemui.shade.NotificationShadeWindowControllerImpl", cl);
         Class<?> bar = XposedHelpers.findClassIfExists("com.android.systemui.statusbar.phone.PhoneStatusBarView", cl);
         if (wc == null || bar == null) {
-            XposedBridge.log("ntweaker: прогрев шторки — не найдено");
+            XposedBridge.log("derealization: shade warm-up — not found");
             return;
         }
         Hook.all(wc, "attach", new XC_MethodHook() {
@@ -47,11 +47,11 @@ public final class ShadeWarm {
                     if (a == MotionEvent.ACTION_DOWN) warm();
                     else if (a == MotionEvent.ACTION_UP || a == MotionEvent.ACTION_CANCEL) cool((View) p.thisObject);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: прогрев шторки — " + t);
+                    XposedBridge.log("derealization: shade warm-up — " + t);
                 }
             }
         });
-        XposedBridge.log("ntweaker: прогрев шторки подключён");
+        XposedBridge.log("derealization: shade warm-up hooked");
     }
 
     private static View root() {
@@ -80,7 +80,7 @@ public final class ShadeWarm {
                 if (XposedHelpers.getBooleanField(st, "panelVisible")) return;
                 XposedHelpers.callMethod(c, "apply", st);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: прогрев шторки, возврат — " + t);
+                XposedBridge.log("derealization: shade warm-up, reset — " + t);
             }
         }, 80);
     }

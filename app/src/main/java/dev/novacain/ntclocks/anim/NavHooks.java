@@ -99,7 +99,7 @@ public final class NavHooks {
                 p.setResult(null);
             }
         });
-        XposedBridge.log("ntweaker: полоска жестов подключена");
+        XposedBridge.log("derealization: gesture bar hooked");
     }
 
     /** Тон палитры: 200 на тёмном фоне (dark = 0), 700 на светлом (dark = 1). */
@@ -137,7 +137,7 @@ public final class NavHooks {
                 applyLauncher(c);
             }
         });
-        XposedBridge.log("ntweaker: полоска жестов (панель задач лаунчера) подключена");
+        XposedBridge.log("derealization: gesture bar (launcher taskbar) hooked");
     }
 
     /** Цвет с непрозрачностью из настроек. */
@@ -171,7 +171,7 @@ public final class NavHooks {
             v.invalidateOutline();
             v.invalidate();
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: полоска жестов (лаунчер) — " + t);
+            XposedBridge.log("derealization: gesture bar (launcher) — " + t);
         }
     }
 
@@ -217,7 +217,7 @@ public final class NavHooks {
             }
             v.invalidate();
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: полоска жестов — " + t);
+            XposedBridge.log("derealization: gesture bar — " + t);
         }
     }
 }

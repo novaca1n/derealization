@@ -42,7 +42,7 @@ public final class Fonts {
                 t = id != 0 ? pc.getResources().getFont(id) : null;
             }
         } catch (Throwable e) {
-            Log.w("NtClocks", "шрифт " + key + " не загружен: " + e);
+            Log.w("NtClocks", "font " + key + " not loaded: " + e);
         }
         if (t == null) t = Typeface.DEFAULT;
         cache.put(key, t);
@@ -75,7 +75,7 @@ public final class Fonts {
 
     /** Название шрифта для списка. */
     public static String title(String key) {
-        if (key == null || key.isEmpty()) return "Родной";
+        if (key == null || key.isEmpty()) return L.t("Default", "Родной");
         if (INTER.equals(key)) return "Inter";
         if (OUTFIT.equals(key)) return "Outfit";
         String s = key.startsWith("crd_") ? key.substring(4) : key;

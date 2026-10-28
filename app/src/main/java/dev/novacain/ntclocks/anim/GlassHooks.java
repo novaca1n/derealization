@@ -46,7 +46,7 @@ public final class GlassHooks {
                                 }
                             });
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: подписка на стекло — " + t);
+                    XposedBridge.log("derealization: glass settings watcher — " + t);
                 }
             }
             return prefs;
@@ -87,7 +87,7 @@ public final class GlassHooks {
                         float behind = XposedHelpers.getFloatField(p.thisObject, "mBehindAlpha");
                         if (behind > g.shadeAlpha) XposedHelpers.setFloatField(p.thisObject, "mBehindAlpha", g.shadeAlpha);
                     } catch (Throwable t) {
-                        XposedBridge.log("ntweaker: подложка быстрых настроек — " + t);
+                        XposedBridge.log("derealization: quick settings backing — " + t);
                     }
                 }
             });
@@ -106,7 +106,7 @@ public final class GlassHooks {
                         if (max > 0 && c != null) p.args[1] = Math.round((Integer) p.args[1] / max * px(c, g.shadeBlur));
                         if (g.shadeAlpha < 0.99f) p.args[2] = false;      // окно не «непрозрачное» — иначе размытие не рисуется
                     } catch (Throwable t) {
-                        XposedBridge.log("ntweaker: размытие шторки — " + t);
+                        XposedBridge.log("derealization: shade blur — " + t);
                     }
                 }
             });
@@ -172,7 +172,7 @@ public final class GlassHooks {
         for (String m : new String[]{"getDimension", "getDimensionPixelSize", "getDimensionPixelOffset"}) {
             XposedHelpers.findAndHookMethod(android.content.res.Resources.class, m, int.class, dims);
         }
-        XposedBridge.log("ntweaker: стекло шторки подключено" + (scrim == null ? " (без ScrimController)" : "") + (blur == null ? " (без BlurUtils)" : ""));
+        XposedBridge.log("derealization: shade glass hooked" + (scrim == null ? " (no ScrimController)" : "") + (blur == null ? " (no BlurUtils)" : ""));
     }
 
     // ───────── меню приложений ─────────
@@ -185,7 +185,7 @@ public final class GlassHooks {
                 new ContentObserver(new Handler(Looper.getMainLooper())) {
                     @Override
                     public void onChange(boolean selfChange) {
-                        XposedBridge.log("ntweaker: цвета значков/виджетов изменились — сброс кэша значков и перезапуск лаунчера");
+                        XposedBridge.log("derealization: icon/widget colors changed — clearing the icon cache and restarting the launcher");
                         // значки лаунчер хранит готовыми картинками (app_icons.db) — без сброса цвет не обновится
                         app.deleteDatabase("app_icons.db");
                         new Handler(Looper.getMainLooper()).postDelayed(() -> android.os.Process.killProcess(android.os.Process.myPid()), 700);
@@ -273,7 +273,7 @@ public final class GlassHooks {
                     try {
                         glassDraw(v, (android.graphics.Canvas) p.args[0]);
                     } catch (Throwable t) {
-                        XposedBridge.log("ntweaker: стекло панели — " + t);
+                        XposedBridge.log("derealization: panel glass — " + t);
                         v.setTag(GLASS_TAG, null);
                     }
                 }
@@ -381,7 +381,7 @@ public final class GlassHooks {
             apps.setRenderEffect(e);
             if (bar != null) bar.setRenderEffect(e);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: размытие под папкой — " + t);
+            XposedBridge.log("derealization: blur under folder — " + t);
         }
     }
 
@@ -410,7 +410,7 @@ public final class GlassHooks {
             GRAIN.put(rl, g.enabled ? g.drawerGrain : 0f);
             rl.invalidate();
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: панель поиска — " + t);
+            XposedBridge.log("derealization: search bar — " + t);
         }
     }
 
@@ -421,7 +421,7 @@ public final class GlassHooks {
                 try {
                     if ("com.nothing.launcher".equals(((Application) p.thisObject).getPackageName())) watchWidgetColors();
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: слежение за цветами виджетов — " + t);
+                    XposedBridge.log("derealization: widget color watcher — " + t);
                 }
             }
         });
@@ -593,11 +593,11 @@ public final class GlassHooks {
                         XposedHelpers.setAdditionalInstanceField(p.thisObject, "ntweakerBlur", radius);
                         l.getWindow().setBackgroundBlurRadius(radius);
                     } catch (Throwable t) {
-                        XposedBridge.log("ntweaker: размытие меню — " + t);
+                        XposedBridge.log("derealization: drawer blur — " + t);
                     }
                 }
             });
         }
-        XposedBridge.log("ntweaker: стекло меню приложений подключено" + (allApps == null ? " (без AllAppsState)" : "") + (depth == null ? " (без глубины)" : ""));
+        XposedBridge.log("derealization: app drawer glass hooked" + (allApps == null ? " (no AllAppsState)" : "") + (depth == null ? " (no depth)" : ""));
     }
 }

@@ -32,12 +32,12 @@ public final class QsCommand {
                                 Object sb = c.getSystemService("statusbar");
                                 XposedHelpers.callMethod(sb, "expandSettingsPanel");
                             } catch (Throwable t) {
-                                XposedBridge.log("ntweaker: быстрые настройки по команде — " + t);
+                                XposedBridge.log("derealization: quick settings on command — " + t);
                             }
                         }
                     }, new IntentFilter(HomeHooks.ACTION_QS), "android.permission.STATUS_BAR", null, Context.RECEIVER_EXPORTED);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: команды SystemUI — " + t);
+                    XposedBridge.log("derealization: SystemUI commands — " + t);
                 }
             }
         });

@@ -33,7 +33,7 @@ public final class ShadeRubber {
         Class<?> win = XposedHelpers.findClassIfExists("com.android.systemui.shade.NotificationShadeWindowView", cl);
         Class<?> bar = XposedHelpers.findClassIfExists("com.android.systemui.statusbar.phone.PhoneStatusBarView", cl);
         if (qsc == null || pv == null || win == null) {
-            XposedBridge.log("ntweaker: упругая шторка — не найдено");
+            XposedBridge.log("derealization: rubber shade — not found");
             return;
         }
         Hook.ctors(qsc, new XC_MethodHook() {
@@ -55,14 +55,14 @@ public final class ShadeRubber {
                     try {
                         touch((MotionEvent) p.args[0]);
                     } catch (Throwable t) {
-                        XposedBridge.log("ntweaker: упругая шторка — " + t);
+                        XposedBridge.log("derealization: rubber shade — " + t);
                     }
                 }
             }
         };
         Hook.all(win, "dispatchTouchEvent", touch);
         if (bar != null) Hook.all(bar, "onTouchEvent", touch);
-        XposedBridge.log("ntweaker: упругая шторка подключена");
+        XposedBridge.log("derealization: rubber shade hooked");
     }
 
     private static void touch(MotionEvent e) {

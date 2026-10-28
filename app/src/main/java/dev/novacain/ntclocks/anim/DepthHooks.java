@@ -71,7 +71,7 @@ public final class DepthHooks {
         Class<?> util = XposedHelpers.findClassIfExists("com.nothing.wallpaper.common.bitmap.BitmapOpaqueUtil", cl);
         Class<?> pct = XposedHelpers.findClassIfExists("com.nothing.wallpaper.common.bitmap.BitmapOpaqueUtil$OpaquePercentage", cl);
         if (util == null || pct == null) {
-            XposedBridge.log("ntweaker: глубина — BitmapOpaqueUtil не найден");
+            XposedBridge.log("derealization: depth — BitmapOpaqueUtil not found");
             return;
         }
         Object satisfied = Enum.valueOf(pct.asSubclass(Enum.class), "SATISFIED");
@@ -87,7 +87,7 @@ public final class DepthHooks {
             });
             n++;
         }
-        XposedBridge.log("ntweaker: глубина в «Обоях и стиле» — перехвачено " + n);
+        XposedBridge.log("derealization: depth in Wallpaper & style — hooked " + n);
         anyWallpaper(cl);
     }
 
@@ -101,7 +101,7 @@ public final class DepthHooks {
         Class<?> off = XposedHelpers.findClassIfExists("com.nothing.wallpaper.picker.lockscreen.depth.DepthEffectState$DepthOff", cl);
         Class<?> flow = XposedHelpers.findClassIfExists("I8.P", cl);
         if (na == null || off == null || flow == null) {
-            XposedBridge.log("ntweaker: глубина для любых обоев — не найдено");
+            XposedBridge.log("derealization: depth for any wallpaper — not found");
             return;
         }
         Object offState = XposedHelpers.getStaticObjectField(off, "INSTANCE");
@@ -117,7 +117,7 @@ public final class DepthHooks {
                 }
             }
         });
-        XposedBridge.log("ntweaker: глубина для любых обоев подключена");
+        XposedBridge.log("derealization: depth for any wallpaper hooked");
     }
 
     // ───────── SystemUI ─────────
@@ -136,7 +136,7 @@ public final class DepthHooks {
                     Bitmap b = clip(p.thisObject, (Bitmap) p.args[0], d.cover);
                     if (b != null) p.args[0] = b;
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: глубина — " + t);
+                    XposedBridge.log("derealization: depth — " + t);
                 }
             }
         });
@@ -149,7 +149,7 @@ public final class DepthHooks {
                 if (p.args.length > 0 && p.args[0] instanceof android.content.Context) listenCutout((android.content.Context) p.args[0]);
             }
         });
-        XposedBridge.log("ntweaker: глубина в SystemUI подключена");
+        XposedBridge.log("derealization: depth in SystemUI hooked");
     }
 
     public static final String CUT_REQUEST = "ntweaker_depth_cut", CUT_DONE = "ntweaker_depth_cut_done";
@@ -180,7 +180,7 @@ public final class DepthHooks {
                 } catch (Throwable t) {
                     Throwable c = t.getCause() != null ? t.getCause() : t;
                     res = c.getClass().getSimpleName() + (c.getMessage() != null ? " " + c.getMessage() : "");
-                    XposedBridge.log("ntweaker: своя маска — " + t);
+                    XposedBridge.log("derealization: custom mask — " + t);
                 }
                 Settings.Global.putString(cr, CUT_REQUEST, null);
                 Settings.Global.putString(cr, CUT_DONE, tag + ":" + res);
@@ -203,12 +203,12 @@ public final class DepthHooks {
                 android.net.Uri.parse("content://dev.novacain.ntclocks.prefs/depth_cutout"))) {
             cut = in != null ? android.graphics.BitmapFactory.decodeStream(in) : null;
         }
-        if (cut == null) return "нет вырезки";
+        if (cut == null) return "no cut-out";
         // как «Обои и стиль» (WallpaperPersister): вырезка под id обоев экрана блокировки, затем depth_effect_state
         Method set = wm.getClass().getMethod("setDepthEffectWallpaperWithWallpaperType", Bitmap.class, boolean.class, int.class, int.class, int.class);
         int depthId = (Integer) set.invoke(wm, cut, true, user, android.app.WallpaperManager.FLAG_LOCK, id);
         Settings.Secure.putInt(ctx.getContentResolver(), "depth_effect_state", depthId != 0 ? 1 : 0);
-        return depthId != 0 ? "ok" : "система не приняла вырезку";
+        return depthId != 0 ? "ok" : "the system didn't accept the cut-out";
     }
 
     /**
@@ -217,7 +217,7 @@ public final class DepthHooks {
      */
     private static String clockShot(android.content.Context ctx) throws Exception {
         Object ctl = controller.get();
-        if (ctl == null) return "часы не найдены";
+        if (ctl == null) return "clock not found";
         final Object[] out = new Object[2];
         java.util.concurrent.CountDownLatch done = new java.util.concurrent.CountDownLatch(1);
         MAIN.post(() -> {
@@ -231,12 +231,12 @@ public final class DepthHooks {
                     out[1] = r;
                 }
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: снимок часов — " + t);
+                XposedBridge.log("derealization: clock snapshot — " + t);
             } finally {
                 done.countDown();
             }
         });
-        if (!done.await(3, java.util.concurrent.TimeUnit.SECONDS) || out[0] == null) return "часы не найдены";
+        if (!done.await(3, java.util.concurrent.TimeUnit.SECONDS) || out[0] == null) return "clock not found";
         java.io.ByteArrayOutputStream png = new java.io.ByteArrayOutputStream();
         ((Bitmap) out[0]).compress(Bitmap.CompressFormat.PNG, 100, png);
         Rect r = (Rect) out[1];
@@ -313,7 +313,7 @@ public final class DepthHooks {
         // выше линии − feather — стереть полностью, в полосе feather — плавно сойти на нет
         erase.setShader(new LinearGradient(0, line - feather, 0, line, 0xFF000000, 0x00000000, Shader.TileMode.CLAMP));
         cv.drawRect(b.left, Math.min(b.top, line - feather), b.right, line, erase);
-        XposedBridge.log("ntweaker: глубина — часы " + r + ", объект закрывает до " + Math.round(cover * 100) + "% снизу");
+        XposedBridge.log("derealization: depth — clock " + r + ", subject covers up to " + Math.round(cover * 100) + "% from below");
         return out;
     }
 
@@ -325,7 +325,7 @@ public final class DepthHooks {
             try {
                 XposedHelpers.callMethod(c, "updateDepthEffectWallpaper");
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: глубина, обновление — " + t);
+                XposedBridge.log("derealization: depth, update — " + t);
             }
         }, "ntweaker-depth").start();
     }

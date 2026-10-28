@@ -53,7 +53,7 @@ public final class XposedEntry implements IXposedHookZygoteInit, IXposedHookLoad
                     try {
                         app.getContentResolver().call(android.net.Uri.parse("content://dev.novacain.ntclocks.prefs"), "alive", null, null);
                     } catch (Throwable t) {
-                        XposedBridge.log("ntweaker: отметка статуса — " + t);
+                        XposedBridge.log("derealization: status report — " + t);
                     }
                 }, 6000);
             }
@@ -67,7 +67,7 @@ public final class XposedEntry implements IXposedHookZygoteInit, IXposedHookLoad
             try {
                 dev.novacain.ntclocks.anim.AboutHooks.hook(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: «О телефоне» — " + t);
+                XposedBridge.log("derealization: About phone — " + t);
             }
             return;
         }
@@ -76,12 +76,12 @@ public final class XposedEntry implements IXposedHookZygoteInit, IXposedHookLoad
             try {
                 dev.novacain.ntclocks.anim.DepthHooks.picker(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: глубина в «Обоях и стиле» — " + t);
+                XposedBridge.log("derealization: depth in Wallpaper & style — " + t);
             }
             try {
                 dev.novacain.ntclocks.anim.PickerHooks.hook(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: derealization в «Обоях и стиле» — " + t);
+                XposedBridge.log("derealization: settings in Wallpaper & style — " + t);
             }
             return;
         }
@@ -91,57 +91,57 @@ public final class XposedEntry implements IXposedHookZygoteInit, IXposedHookLoad
             try {
                 dev.novacain.ntclocks.anim.AnimHooks.launcher(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: лаунчер — " + t);
+                XposedBridge.log("derealization: launcher — " + t);
             }
             try {
                 dev.novacain.ntclocks.anim.OriginHooks.launcher(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: OriginOS (лаунчер) — " + t);
+                XposedBridge.log("derealization: OriginOS (launcher) — " + t);
             }
             try {
                 dev.novacain.ntclocks.anim.ResizeHooks.hook(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: растягивание значков — " + t);
+                XposedBridge.log("derealization: icon resize — " + t);
             }
             try {
                 dev.novacain.ntclocks.anim.LucentHooks.hook(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: прозрачные папки — " + t);
+                XposedBridge.log("derealization: translucent folders — " + t);
             }
             try {
                 dev.novacain.ntclocks.anim.NavHooks.launcher(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: полоска жестов (лаунчер) — " + t);
+                XposedBridge.log("derealization: gesture bar (launcher) — " + t);
             }
             try {
                 dev.novacain.ntclocks.anim.GlassHooks.launcher(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: стекло меню — " + t);
+                XposedBridge.log("derealization: drawer glass — " + t);
             }
             try {
                 dev.novacain.ntclocks.anim.HomeHooks.launcher(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: стол и док — " + t);
+                XposedBridge.log("derealization: home and dock — " + t);
             }
             try {
                 dev.novacain.ntclocks.anim.HomeWave.launcher(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: живой стол — " + t);
+                XposedBridge.log("derealization: living home — " + t);
             }
             try {
                 dev.novacain.ntclocks.anim.IconExport.launcher(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: значки для Hive — " + t);
+                XposedBridge.log("derealization: Hive icons — " + t);
             }
             try {
                 dev.novacain.ntclocks.anim.Gravity.launcher(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: гравитация — " + t);
+                XposedBridge.log("derealization: gravity — " + t);
             }
             try {
                 dev.novacain.ntclocks.anim.Coloros17.launcher(lpparam.classLoader);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: ColorOS 17 (лаунчер) — " + t);
+                XposedBridge.log("derealization: ColorOS 17 (launcher) — " + t);
             }
             return;
         }
@@ -155,67 +155,67 @@ public final class XposedEntry implements IXposedHookZygoteInit, IXposedHookLoad
         try {
             dev.novacain.ntclocks.anim.AnimHooks.shell();
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: переходы — " + t);
+            XposedBridge.log("derealization: transitions — " + t);
         }
         try {
             dev.novacain.ntclocks.anim.QsSliders.hook(lpparam.classLoader);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: вертикальные ползунки — " + t);
+            XposedBridge.log("derealization: vertical sliders — " + t);
         }
         try {
             dev.novacain.ntclocks.anim.DepthHooks.systemui(lpparam.classLoader);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: глубина — " + t);
+            XposedBridge.log("derealization: depth — " + t);
         }
         try {
             dev.novacain.ntclocks.anim.QsCommand.hook();
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: команды SystemUI — " + t);
+            XposedBridge.log("derealization: SystemUI commands — " + t);
         }
         try {
             dev.novacain.ntclocks.anim.UnlockAnim.hook(lpparam.classLoader);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: разблокировка — " + t);
+            XposedBridge.log("derealization: unlock — " + t);
         }
         try {
             dev.novacain.ntclocks.anim.LockWidgets.hook(lpparam.classLoader);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: виджеты экрана блокировки — " + t);
+            XposedBridge.log("derealization: lock screen widgets — " + t);
         }
         try {
             dev.novacain.ntclocks.anim.NavHooks.hook(lpparam.classLoader);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: полоска жестов — " + t);
+            XposedBridge.log("derealization: gesture bar — " + t);
         }
         try {
             dev.novacain.ntclocks.anim.ColorEngine.hook(lpparam.classLoader);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: цвета — " + t);
+            XposedBridge.log("derealization: colors — " + t);
         }
         try {
             dev.novacain.ntclocks.anim.SplitShade.hook(lpparam.classLoader);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: раздельная шторка — " + t);
+            XposedBridge.log("derealization: split shade — " + t);
         }
         try {
             dev.novacain.ntclocks.anim.OriginHooks.systemui(lpparam.classLoader);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: шторка OriginOS — " + t);
+            XposedBridge.log("derealization: OriginOS shade — " + t);
         }
         try {
             dev.novacain.ntclocks.anim.GlassHooks.shade(lpparam.classLoader);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: стекло шторки — " + t);
+            XposedBridge.log("derealization: shade glass — " + t);
         }
         try {
             dev.novacain.ntclocks.anim.ShadeWarm.hook(lpparam.classLoader);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: прогрев шторки — " + t);
+            XposedBridge.log("derealization: shade warm-up — " + t);
         }
         try {
             dev.novacain.ntclocks.anim.ShadeRubber.hook(lpparam.classLoader);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: упругая шторка — " + t);
+            XposedBridge.log("derealization: rubber shade — " + t);
         }
         try {
             dev.novacain.ntclocks.anim.Coloros17.systemui(lpparam.classLoader);
@@ -250,14 +250,14 @@ public final class XposedEntry implements IXposedHookZygoteInit, IXposedHookLoad
                             loader(ctx, sysui).loadClass("dev.novacain.ntclocks.sysui.Injector")
                                     .getMethod("afterSliceLayout", Object.class).invoke(null, param.thisObject);
                         } catch (Throwable t) {
-                            XposedBridge.log("NtClocks: дата — " + t);
+                            XposedBridge.log("derealization: date — " + t);
                         }
                     }
                 });
             }
-            XposedBridge.log("NtClocks: SystemUI подхвачен");
+            XposedBridge.log("derealization: SystemUI hooked");
         } catch (Throwable t) {
-            XposedBridge.log("NtClocks: не удалось подключиться к SystemUI — " + t);
+            XposedBridge.log("derealization: couldn't attach to SystemUI — " + t);
         }
     }
 }

@@ -346,7 +346,7 @@ public final class WidgetCards {
             }
             float size = h * (num.length() > 4 ? 0.18f : 0.22f);
             text(c, num, HEAVY, size, t.onSurface, cx, cy + size * 0.18f, Paint.Align.CENTER);
-            text(c, "шагов", MEDIUM, h * 0.08f, t.onSurfaceVariant, cx, cy + h * 0.17f, Paint.Align.CENTER);
+            text(c, L.t("steps", "шагов"), MEDIUM, h * 0.08f, t.onSurfaceVariant, cx, cy + h * 0.17f, Paint.Align.CENTER);
         }
 
         /** Волна вдоль дуги: радиус R + амплитуда·sin(частота·угол); строится только при смене прогресса или размера. */

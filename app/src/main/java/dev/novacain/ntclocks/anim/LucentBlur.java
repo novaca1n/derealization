@@ -71,8 +71,8 @@ public final class LucentBlur {
                 setColor = d.getClass().getMethod("setColor", int.class);
             }
             Entry n = new Entry(anchor, d);
-            if (DEBUG) XposedBridge.log("ntweaker: системное размытие для " + anchor.getClass().getName() + " id " + anchor.getId()
-                    + " (обои: live=" + wallLive + ", копия=" + (wallBlur != null) + ")\n" + android.util.Log.getStackTraceString(new Throwable()).split("\n", 8)[3]
+            if (DEBUG) XposedBridge.log("derealization: system blur for " + anchor.getClass().getName() + " id " + anchor.getId()
+                    + " (wallpaper: live=" + wallLive + ", copy=" + (wallBlur != null) + ")\n" + android.util.Log.getStackTraceString(new Throwable()).split("\n", 8)[3]
                     + " " + android.util.Log.getStackTraceString(new Throwable()).split("\n", 9)[4]);
             XposedHelpers.setAdditionalInstanceField(key, "ntBlur", n);
             entries.add(n);
@@ -80,7 +80,7 @@ public final class LucentBlur {
             return n;
         } catch (Throwable t) {
             broken = true;
-            XposedBridge.log("ntweaker: размытие под папками/виджетами недоступно — " + t);
+            XposedBridge.log("derealization: blur under folders/widgets unavailable — " + t);
             return null;
         }
     }
@@ -433,7 +433,7 @@ public final class LucentBlur {
                     }
                 }
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: размытые обои — " + t);
+                XposedBridge.log("derealization: blurred wallpaper — " + t);
             }
             Bitmap res = out;
             boolean isLive = live;
@@ -451,8 +451,8 @@ public final class LucentBlur {
                 }
                 wallW = sw;
                 wallH = sh;
-                XposedBridge.log("ntweaker: размытые обои — " + (res != null ? res.getWidth() + "×" + res.getHeight()
-                        + ", радиус " + blurPx + " px" : isLive ? "обои живые — системное размытие" : "картинку не получить — системное размытие"));
+                XposedBridge.log("derealization: blurred wallpaper — " + (res != null ? res.getWidth() + "×" + res.getHeight()
+                        + ", radius " + blurPx + " px" : isLive ? "live wallpaper — system blur" : "no wallpaper image — system blur"));
                 invalidateOwners();
             });
         }, "ntweaker-wallblur").start();
@@ -472,7 +472,7 @@ public final class LucentBlur {
                 invalidateOwners();
             }, new android.os.Handler(android.os.Looper.getMainLooper()));
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: слежение за обоями — " + t);
+            XposedBridge.log("derealization: wallpaper watcher — " + t);
         }
     }
 

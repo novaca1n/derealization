@@ -65,7 +65,7 @@ public final class ResizeHooks {
         Class<?> item = XposedHelpers.findClassIfExists("com.android.launcher3.model.data.ItemInfo", cl);
         Class<?> wsItem = XposedHelpers.findClassIfExists("com.android.launcher3.model.data.WorkspaceItemInfo", cl);
         if (expand == null || reduce == null || bubble == null || item == null || wsItem == null) {
-            XposedBridge.log("ntweaker: растягивание значков — не найдено");
+            XposedBridge.log("derealization: icon resize — not found");
             return;
         }
         folderInfo = XposedHelpers.findClassIfExists("com.android.launcher3.model.data.FolderInfo", cl);
@@ -96,7 +96,7 @@ public final class ResizeHooks {
                     view.post(() -> apply(launcher, view, 1, 1));
                     p.setResult(null);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: уменьшить значок — " + t);
+                    XposedBridge.log("derealization: shrink icon — " + t);
                 }
             }
         });
@@ -149,7 +149,7 @@ public final class ResizeHooks {
         });
         cornerFrame(cl, wsItem);
         folderCapsule(cl);
-        XposedBridge.log("ntweaker: растягивание значков подключено");
+        XposedBridge.log("derealization: icon resize hooked");
     }
 
     // ───────── растягивание за угол ─────────
@@ -191,7 +191,7 @@ public final class ResizeHooks {
                     layer.addView(f, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                     frameRef = new java.lang.ref.WeakReference<>(f);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: рамка значка — " + t);
+                    XposedBridge.log("derealization: icon frame — " + t);
                 }
             }
         });
@@ -333,7 +333,7 @@ public final class ResizeHooks {
                 gapY = cellH - (cur.height() - (curY - 1) * cellH);
                 box.set(cur);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: рамка значка, сетка — " + t);
+                XposedBridge.log("derealization: icon frame, grid — " + t);
             }
         }
 
@@ -633,7 +633,7 @@ public final class ResizeHooks {
             }
             if ((Integer) XposedHelpers.callMethod(b, "c") <= -1) {
                 int id = launcher.getResources().getIdentifier("out_of_space", "string", launcher.getPackageName());
-                Toast.makeText(launcher, id != 0 ? launcher.getString(id) : "Нет места", Toast.LENGTH_SHORT).show();
+                Toast.makeText(launcher, id != 0 ? launcher.getString(id) : L.t("No room", "Нет места"), Toast.LENGTH_SHORT).show();
                 return;
             }
             XposedHelpers.setIntField(info, "resizeCellX", XposedHelpers.getIntField(info, "cellX"));
@@ -654,7 +654,7 @@ public final class ResizeHooks {
             XposedHelpers.callMethod(rm, "z", info, view, false);
             pop(view);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: смена размера значка — " + t);
+            XposedBridge.log("derealization: icon resize — " + t);
         }
     }
 
@@ -685,7 +685,7 @@ public final class ResizeHooks {
                         XposedHelpers.setIntField(rm, "c", oh);
                     }
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: папка — увеличить " + t);
+                    XposedBridge.log("derealization: folder — enlarge " + t);
                 }
             };
             if (cx > 1 && sx > 1) {
@@ -696,7 +696,7 @@ public final class ResizeHooks {
                 grow.run();
             }
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: размер папки — " + t);
+            XposedBridge.log("derealization: folder size — " + t);
         }
     }
 
@@ -831,7 +831,7 @@ public final class ResizeHooks {
                     int n = Math.min(4, box.getChildCount());
                     float total = n * size + (n - 1) * gap;
                     int left = Math.round((w - total) / 2f + i * (size + gap)), top = (h - size) / 2;
-                    if (DEBUG_CAPSULE) XposedBridge.log("ntweaker: капсула — " + i + "/" + box.getChildCount() + " " + child.getTag()
+                    if (DEBUG_CAPSULE) XposedBridge.log("derealization: capsule — " + i + "/" + box.getChildCount() + " " + child.getTag()
                             + " vis " + child.getVisibility() + " alpha " + child.getAlpha() + " scrollX " + box.getScrollX());
                     if (i >= 4) child.layout(0, 0, 0, 0);
                     else {
@@ -866,7 +866,7 @@ public final class ResizeHooks {
             if (!(Boolean) XposedHelpers.callMethod(cell, "isRegionVacant", x, y, sx, sy)) {
                 XposedHelpers.callMethod(cell, "markCellsAsOccupiedForView", view);
                 int id = launcher.getResources().getIdentifier("out_of_space", "string", launcher.getPackageName());
-                Toast.makeText(launcher, id != 0 ? launcher.getString(id) : "Нет места", Toast.LENGTH_SHORT).show();
+                Toast.makeText(launcher, id != 0 ? launcher.getString(id) : L.t("No room", "Нет места"), Toast.LENGTH_SHORT).show();
                 return;
             }
             fSpanX.setInt(info, sx);
@@ -883,7 +883,7 @@ public final class ResizeHooks {
                     XposedHelpers.getIntField(info, "screenId"), x, y, sx, sy);
             pop(view);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: папка, размер на месте — " + t);
+            XposedBridge.log("derealization: folder, resize in place — " + t);
         }
     }
 
@@ -901,7 +901,7 @@ public final class ResizeHooks {
             XposedHelpers.setIntField(back, "basePreviewOffsetY", box.getTop() + child.getTop());
             XposedHelpers.setIntField(back, "previewSize", child.getWidth());
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: капсула, превью — " + t);
+            XposedBridge.log("derealization: capsule, preview — " + t);
         }
     }
 

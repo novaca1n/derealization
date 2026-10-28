@@ -36,7 +36,7 @@ public final class SplitShade {
         Class<?> pv = XposedHelpers.findClassIfExists("com.android.systemui.shade.NotificationPanelView", cl);
         Class<?> sm = XposedHelpers.findClassIfExists("com.android.systemui.shade.ShadeExpansionStateManager", cl);
         if (qsc == null || pv == null || sm == null) {
-            XposedBridge.log("ntweaker: раздельная шторка — не найдено");
+            XposedBridge.log("derealization: split shade — not found");
             return;
         }
         Hook.ctors(qsc, new XC_MethodHook() {
@@ -68,7 +68,7 @@ public final class SplitShade {
                     if (mode == RIGHT) p.setResult(true);
                     else noImmediateQs();
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: раздельная шторка (касание) — " + t);
+                    XposedBridge.log("derealization: split shade (touch) — " + t);
                 }
             }
         });
@@ -102,11 +102,11 @@ public final class SplitShade {
                 try {
                     update((Float) p.args[0]);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: раздельная шторка — " + t);
+                    XposedBridge.log("derealization: split shade — " + t);
                 }
             }
         });
-        XposedBridge.log("ntweaker: раздельная шторка подключена");
+        XposedBridge.log("derealization: split shade hooked");
     }
 
     /** Флаг «раскрыть сразу быстрые настройки» иногда остаётся после прошлого закрытия — слева он не нужен. */

@@ -21,8 +21,8 @@ internal object Patcher {
     /** Пропатчено ли (по нашему последнему действию; до первого — считаем, что да, если модуль уже работал). */
     fun isPatched(ctx: Context): Boolean = prefs(ctx).getBoolean("patched", true)
 
-    private val NAMES = mapOf("com.android.systemui" to "SystemUI", "com.nothing.launcher" to "лаунчер",
-        "com.nothing.wallpaper" to "«Обои и стиль»", "com.android.settings" to "«Настройки»")
+    private val NAMES get() = mapOf("com.android.systemui" to "SystemUI", "com.nothing.launcher" to s(R.string.target_launcher),
+        "com.nothing.wallpaper" to s(R.string.target_wallpaper), "com.android.settings" to s(R.string.target_settings))
 
     /** Цели, ушедшие в безопасный режим (Guard: падали три раза подряд — derealization в них не включается). */
     suspend fun safeMode(): List<String> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
@@ -48,7 +48,7 @@ internal object Patcher {
             val v = runCatching { ctx.packageManager.getPackageInfo(pkg, 0).longVersionCode }.getOrNull() ?: continue
             if (v != code) changed += NAMES[pkg] ?: pkg
         }
-        return if (changed.isEmpty()) null else "Обновилось: " + changed.joinToString(", ") + " — часть твиков может не встать"
+        return if (changed.isEmpty()) null else s(R.string.patch_updated_warning, changed.joinToString(", "))
     }
 
     /** Что не встало с последней загрузки: строки «не найдено» и ошибки из журнала Vector. */
@@ -56,7 +56,7 @@ internal object Patcher {
         val boot = System.currentTimeMillis() - android.os.SystemClock.elapsedRealtime()
         val fmt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.ROOT)
         su("cat /data/adb/lspd/log/modules_*.log 2>/dev/null | grep -E 'ntweaker|derealization'").second.lineSequence()
-            .filter { it.contains("не найден") || it.contains("Exception") || it.contains("Error") }
+            .filter { it.contains("не найден") || it.contains("not found") || it.contains("Exception") || it.contains("Error") }
             .filter { l -> runCatching { fmt.parse(l.substringAfter("[ ").take(19))!!.time >= boot }.getOrDefault(false) }
             .map { it.substringAfter("] ").substringAfter(": ").take(90) }
             .distinct().toList()
@@ -84,20 +84,20 @@ internal object Patcher {
     /** Общее начало: root и Vector. null — можно продолжать, иначе текст ошибки. */
     private suspend fun preflight(step: suspend (String) -> Unit): String? {
         val (rc, id) = su("id -u")
-        if (rc != 0 || id.trim() != "0") return "Нет root — без него патч невозможен"
-        step("Root получен")
-        if (su("test -x $CLI").first != 0) return "Vector не найден — нужен Vector (LSPosed)"
-        step("Vector на месте")
+        if (rc != 0 || id.trim() != "0") return s(R.string.patch_no_root)
+        step(s(R.string.patch_root_ok))
+        if (su("test -x $CLI").first != 0) return s(R.string.patch_no_vector)
+        step(s(R.string.patch_vector_ok))
         return null
     }
 
     private suspend fun restart(step: suspend (String) -> Unit) {
         su("am force-stop com.nothing.wallpaper")
-        step("«Обои и стиль» перезапущены")
+        step(s(R.string.patch_restarted_wallpaper))
         su("am force-stop com.android.settings")
-        step("«Настройки» перезапущены")
+        step(s(R.string.patch_restarted_settings))
         su("am force-stop com.nothing.launcher")
-        step("Лаунчер перезапущен")
+        step(s(R.string.patch_restarted_launcher))
     }
 
     /**
@@ -112,16 +112,16 @@ internal object Patcher {
     suspend fun patch(ctx: Context, step: suspend (String) -> Unit): Boolean {
         preflight(step)?.let { step(it); return false }
         val (rc, out) = su("$CLI modules enable $PKG")
-        if (rc != 0) { step("Vector не включил модуль: $out".take(120)); return false }
-        step("derealization включён в Vector")
+        if (rc != 0) { step(s(R.string.patch_enable_failed, out).take(120)); return false }
+        step(s(R.string.patch_enabled))
         val scope = TARGETS.joinToString(" ") { "$it/0" }
         val (rc2, out2) = su("$CLI scope set $PKG $scope")
-        if (rc2 != 0) { step("Vector не принял цели: $out2".take(120)); return false }
-        step("Цели: SystemUI, лаунчер, «Обои и стиль», «Настройки»")
-        if (Tweaks.isOff(ctx)) { Tweaks.restoreAll(ctx); step("Настройки возвращены") }
+        if (rc2 != 0) { step(s(R.string.patch_scope_failed, out2).take(120)); return false }
+        step(s(R.string.patch_scope_ok))
+        if (Tweaks.isOff(ctx)) { Tweaks.restoreAll(ctx); step(s(R.string.patch_settings_restored)) }
         installStore(ctx, step)
         clearGuards()
-        step("Счётчики безопасного режима сброшены")
+        step(s(R.string.patch_guards_cleared))
         Alive.clear(ctx)
         restart(step)
         prefs(ctx).edit().putBoolean("patched", true).commit()
@@ -129,10 +129,10 @@ internal object Patcher {
         var launcher = false
         for (i in 0 until 20) {
             delay(500)
-            if (Alive.since(ctx, "com.nothing.launcher")) { launcher = true; step("Лаунчер: код внедрён"); break }
+            if (Alive.since(ctx, "com.nothing.launcher")) { launcher = true; step(s(R.string.patch_launcher_alive)); break }
         }
-        if (!launcher) step("Лаунчер ещё не отозвался — проверю позже")
-        step("SystemUI перезапустится после затемнения")
+        if (!launcher) step(s(R.string.patch_launcher_wait))
+        step(s(R.string.patch_systemui_later))
         return true
     }
 
@@ -175,11 +175,11 @@ internal object Patcher {
     suspend fun unpatch(ctx: Context, step: suspend (String) -> Unit): Boolean {
         preflight(step)?.let { step(it); return false }
         val (rc, out) = su("$CLI modules disable $PKG")
-        if (rc != 0) { step("Vector не выключил модуль: $out".take(120)); return false }
-        step("derealization выключен в Vector")
+        if (rc != 0) { step(s(R.string.unpatch_failed, out).take(120)); return false }
+        step(s(R.string.unpatch_done))
         Alive.clear(ctx)
         restart(step)
-        step("SystemUI перезапустится после затемнения")
+        step(s(R.string.patch_systemui_later))
         prefs(ctx).edit().putBoolean("patched", false).commit()
         return true
     }

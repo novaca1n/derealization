@@ -46,37 +46,37 @@ internal fun DepthTab() {
         Save.later("depth", 200) { runCatching { DepthPrefs.write(cr, saved) } }
     }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
-        Group("Своя маска") {
+        Group(s(R.string.depth_custom_mask)) {
             Text(
-                "Любое фото на экран блокировки: объект выделится сам, поправь его пальцем — и он встанет поверх часов.",
+                s(R.string.depth_custom_mask_hint),
                 style = t(13, c = Dim), modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
             )
-            Button("Выбрать фото", primary = true) {
+            Button(s(R.string.depth_pick_photo), primary = true) {
                 ctx.startActivity(Intent(ctx, DepthMaskActivity::class.java))
             }
             Spacer(Modifier.height(8.dp))
-            Button("Убрать", primary = false) {
+            Button(s(R.string.action_remove), primary = false) {
                 scope.launch {
                     val err = withContext(Dispatchers.IO) { DepthApply.remove(ctx) }
-                    android.widget.Toast.makeText(ctx, err ?: "Экран блокировки снова с обоями рабочего стола", android.widget.Toast.LENGTH_SHORT).show()
+                    android.widget.Toast.makeText(ctx, err ?: s(R.string.depth_removed), android.widget.Toast.LENGTH_SHORT).show()
                 }
             }
             Spacer(Modifier.height(8.dp))
         }
-        Group("Для любых обоев") {
-            SwitchRow("Не запрещать эффект", d.anyWallpaper) { v -> update { anyWallpaper = v } }
+        Group(s(R.string.depth_any_title)) {
+            SwitchRow(s(R.string.depth_any), d.anyWallpaper) { v -> update { anyWallpaper = v } }
             Text(
-                "«Обои и стиль» разрешают глубину и со стеклом обоев, с широким виджетом и когда объект не заходит на часы.",
+                s(R.string.depth_any_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp)
             )
         }
-        Group("Под мои большие часы") {
-            SwitchRow("Подрезать объект по часам", d.enabled) { v -> update { enabled = v } }
+        Group(s(R.string.depth_big_clock_title)) {
+            SwitchRow(s(R.string.depth_cut), d.enabled) { v -> update { enabled = v } }
             if (d.enabled) {
-                SliderRow("Объект закрывает часы снизу", d.cover, 0f..0.8f, { "до ${(it * 100).toInt()}%" }) { v -> update { cover = v } }
+                SliderRow(s(R.string.depth_cover), d.cover, 0f..0.8f, { s(R.string.depth_cover_value, (it * 100).toInt()) }) { v -> update { cover = v } }
             }
             Text(
-                "Объект заходит только на нижнюю часть часов — цифры остаются читаемыми.",
+                s(R.string.depth_cover_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp)
             )
         }

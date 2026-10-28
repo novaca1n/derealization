@@ -41,7 +41,7 @@ public final class UnlockAnim {
     public static void hook(ClassLoader cl) {
         Class<?> repo = XposedHelpers.findClassIfExists("com.android.systemui.keyguard.data.repository.KeyguardTransitionRepositoryImpl", cl);
         if (repo == null) {
-            XposedBridge.log("ntweaker: разблокировка — переходы не найдены");
+            XposedBridge.log("derealization: unlock — transitions not found");
             return;
         }
         Hook.all(repo, "emitTransition", new XC_MethodHook() {
@@ -50,7 +50,7 @@ public final class UnlockAnim {
                 try {
                     step(p.args[0]);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: разблокировка — " + t);
+                    XposedBridge.log("derealization: unlock — " + t);
                 }
             }
         });
@@ -58,7 +58,7 @@ public final class UnlockAnim {
         if (sm != null) Hook.all(sm, "onPanelExpansionChanged", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam p) {
-                if (DEBUG) XposedBridge.log("ntweaker: разблокировка — панель " + p.args[0] + " " + p.args[1] + " " + p.args[2]);
+                if (DEBUG) XposedBridge.log("derealization: unlock — panel " + p.args[0] + " " + p.args[1] + " " + p.args[2]);
                 // свайп вверх по экрану блокировки: панель сворачивается за пальцем (1 → ~0.55), потом пружинит назад.
                 // Ввод PIN у Nothing накрывает экран уже на первой трети пути — часы должны успеть уехать к 0.78
                 if (!onLockscreen) return;
@@ -76,7 +76,7 @@ public final class UnlockAnim {
                 clockRef = new WeakReference<>(null);
             }
         });
-        XposedBridge.log("ntweaker: разблокировка по-iOS подключена");
+        XposedBridge.log("derealization: iOS-style unlock hooked");
     }
 
     private static void prefs() {
@@ -113,7 +113,7 @@ public final class UnlockAnim {
         String to = String.valueOf(XposedHelpers.callMethod(s, "getTo"));
         float v = (Float) XposedHelpers.callMethod(s, "getValue");
         String state = String.valueOf(XposedHelpers.callMethod(s, "getTransitionState"));
-        if (DEBUG && !state.equals("RUNNING")) XposedBridge.log("ntweaker: разблокировка — шаг " + from + "→" + to + " " + v + " " + state);
+        if (DEBUG && !state.equals("RUNNING")) XposedBridge.log("derealization: unlock — step " + from + "→" + to + " " + v + " " + state);
         if (to.equals("LOCKSCREEN") && !from.endsWith("BOUNCER")) {
             // экран блокировки снова показывается (пробуждение, блокировка) — часы на место
             onLockscreen = true;

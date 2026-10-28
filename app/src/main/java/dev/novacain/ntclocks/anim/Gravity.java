@@ -73,7 +73,7 @@ public final class Gravity {
         Class<?> drag = XposedHelpers.findClassIfExists("com.android.launcher3.dragndrop.DragLayer", cl);
         Class<?> st = XposedHelpers.findClassIfExists("com.android.launcher3.LauncherState", cl);
         if (l == null || drag == null) {
-            XposedBridge.log("ntweaker: гравитация — лаунчер не найден");
+            XposedBridge.log("derealization: gravity — launcher not found");
             return;
         }
         if (st != null) normalState = XposedHelpers.getStaticObjectField(st, "NORMAL");
@@ -99,7 +99,7 @@ public final class Gravity {
                         }
                     }, new android.content.IntentFilter(ACTION), "android.permission.STATUS_BAR", null, Context.RECEIVER_EXPORTED);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: гравитация, приёмник — " + t);
+                    XposedBridge.log("derealization: gravity, receiver — " + t);
                 }
             }
         });
@@ -130,12 +130,12 @@ public final class Gravity {
                 try {
                     touch((MotionEvent) p.args[0]);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: гравитация, касание — " + t);
+                    XposedBridge.log("derealization: gravity, touch — " + t);
                 }
                 p.setResult(true);
             }
         });
-        XposedBridge.log("ntweaker: гравитация подключена");
+        XposedBridge.log("derealization: gravity hooked");
     }
 
     private static boolean on() {
@@ -254,7 +254,7 @@ public final class Gravity {
             Object hs = XposedHelpers.callMethod(a, "getHotseat");
             if (hs != null) add((ViewGroup) XposedHelpers.callMethod(hs, "getShortcutsAndWidgets"));
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: гравитация, значки — " + t);
+            XposedBridge.log("derealization: gravity, icons — " + t);
             return;
         }
         int n = views.size();

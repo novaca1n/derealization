@@ -74,7 +74,7 @@ public final class QsSliders {
                         Slider sl = new Slider(tile.getContext(), bright);
                         tile.addView(sl, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                     } catch (Throwable t) {
-                        XposedBridge.log("ntweaker: плитка-ползунок — " + t);
+                        XposedBridge.log("derealization: slider tile — " + t);
                     }
                 }
             });
@@ -115,7 +115,7 @@ public final class QsSliders {
                 }
             });
         }
-        XposedBridge.log("ntweaker: плитки-ползунки подключены" + (ex == null ? " (без createTileView)" : "") + (sheet == null ? " (без списка плиток)" : ""));
+        XposedBridge.log("derealization: slider tiles hooked" + (ex == null ? " (no createTileView)" : "") + (sheet == null ? " (no tile list)" : ""));
     }
 
     private static float dp(Context c, float v) {
@@ -169,7 +169,7 @@ public final class QsSliders {
             icon.setStyle(Paint.Style.STROKE);
             icon.setStrokeCap(Paint.Cap.ROUND);
             icon.setStrokeJoin(Paint.Join.ROUND);
-            setContentDescription(bright ? "Яркость" : "Громкость");
+            setContentDescription(bright ? L.t("Brightness", "Яркость") : L.t("Volume", "Громкость"));
         }
 
         private int color(String name, int fallback) {
@@ -247,7 +247,7 @@ public final class QsSliders {
                     value = am.getStreamVolume(AudioManager.STREAM_MUSIC) / (float) Math.max(1, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
                 }
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: ползунок, чтение — " + t);
+                XposedBridge.log("derealization: slider, read — " + t);
             }
             invalidate();
         }
@@ -275,7 +275,7 @@ public final class QsSliders {
                     }
                 }
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: ползунок, запись — " + t);
+                XposedBridge.log("derealization: slider, write — " + t);
             }
         }
 

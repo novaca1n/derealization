@@ -64,7 +64,7 @@ final class PrefsClient {
                 }
             });
         } catch (Throwable e) {
-            Log.w(TAG, "не удалось подписаться на настройки (приложение не установлено?)", e);
+            Log.w(TAG, "couldn't subscribe to settings (app not installed?)", e);
         }
         try {
             // страховка: если в самом раннем старте настройки не прочитались — перечитать после разблокировки
@@ -75,7 +75,7 @@ final class PrefsClient {
                 }
             }, new IntentFilter(Intent.ACTION_USER_UNLOCKED), null, bg, Context.RECEIVER_NOT_EXPORTED);
         } catch (Throwable e) {
-            Log.w(TAG, "нет подписки на разблокировку", e);
+            Log.w(TAG, "no unlock subscription", e);
         }
         bg.post(this::reloadAll);
     }
@@ -123,7 +123,7 @@ final class PrefsClient {
         try (Cursor c = context.getContentResolver().query(Uri.withAppendedPath(BASE, id), null, null, null, null)) {
             if (c != null && c.moveToFirst()) return c.getString(0);
         } catch (Throwable e) {
-            Log.w(TAG, "настройки " + id + " не прочитаны: " + e);
+            Log.w(TAG, "settings " + id + " not read: " + e);
         }
         return null;
     }

@@ -112,12 +112,12 @@ internal fun AnimTab() {
 
     var sub by androidx.compose.runtime.saveable.rememberSaveable { mutableIntStateOf(0) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
-        SubTabs(listOf("Стиль", "Тонко"), sub) { sub = it }
+        SubTabs(listOf(s(R.string.anim_tab_style), s(R.string.anim_tab_fine)), sub) { sub = it }
         if (sub == 0) {
         Spacer(Modifier.height(10.dp))
         Demo(a, Modifier.align(Alignment.CenterHorizontally))
         Text(
-            "Нажми на иконку. Полоска внизу окна — домой, строка в окне — переход внутри приложения.",
+            s(R.string.anim_preview_hint),
             style = t(12, c = Dim), modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp)
         )
 
@@ -127,36 +127,36 @@ internal fun AnimTab() {
             version++
         }
         Text(
-            "Пресет задаёт всё сразу: открытие, закрытие, стол и переходы. Подкрутить — на вкладке «Тонко».",
+            s(R.string.anim_preset_hint),
             style = t(12, c = Dim), modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp)
         )
         } else {
 
-        Group("Открытие") {
-            SliderRow("Скорость", a.openStiffness, 120f..1200f, { "≈ ${settleMs(it, a.openDamping)} мс" }) { v -> update(true) { openStiffness = v } }
-            SliderRow("Пружинистость", 1f - a.openDamping, -0.2f..0.45f, { if (it < -0.005f) "мягкий доезд" else "${(it * 100).roundToInt()}%" }) { v -> update(true) { openDamping = 1f - v } }
+        Group(s(R.string.anim_open)) {
+            SliderRow(s(R.string.anim_speed), a.openStiffness, 120f..1200f, { s(R.string.anim_settle_ms, settleMs(it, a.openDamping)) }) { v -> update(true) { openStiffness = v } }
+            SliderRow(s(R.string.anim_bounce), 1f - a.openDamping, -0.2f..0.45f, { if (it < -0.005f) s(R.string.anim_no_bounce) else "${(it * 100).roundToInt()}%" }) { v -> update(true) { openDamping = 1f - v } }
         }
-        Group("Растягивание") {
-            SwitchRow("Окно «растягивается» к краям", a.stretch) { v -> update(false) { stretch = v } }
-            if (a.stretch) SwitchRow("Дальний от значка край — первым (ColorOS 17)", a.stretchBottom) { v -> update(false) { stretchBottom = v } }
-            Text(if (a.stretchBottom) "Открытие: низ окна приходит к краям намного раньше, верх — последним. Закрытие — наоборот."
-                else "Как в iOS 26: по ширине окно упирается в края раньше, ближний бок — первым.",
+        Group(s(R.string.anim_stretch)) {
+            SwitchRow(s(R.string.anim_stretch_edges), a.stretch) { v -> update(false) { stretch = v } }
+            if (a.stretch) SwitchRow(s(R.string.anim_far_edge_first), a.stretchBottom) { v -> update(false) { stretchBottom = v } }
+            Text(if (a.stretchBottom) s(R.string.anim_far_edge_hint)
+                else s(R.string.anim_stretch_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp))
-            if (a.stretch) SwitchRow("Интерфейс тянется вместе с окном", a.warp) { v -> update(false) { warp = v } }
-            SwitchRow("Нажатие на иконку как в ColorOS", a.iconPress) { v -> update(false) { iconPress = v } }
+            if (a.stretch) SwitchRow(s(R.string.anim_warp), a.warp) { v -> update(false) { warp = v } }
+            SwitchRow(s(R.string.anim_icon_press), a.iconPress) { v -> update(false) { iconPress = v } }
         }
-        Group("Закрытие и жест домой") {
-            SliderRow("Скорость", a.closeStiffness, 120f..1200f, { "≈ ${settleMs(it, a.closeDamping)} мс" }) { v -> update(true) { closeStiffness = v } }
-            SliderRow("Пружинистость", 1f - a.closeDamping, -0.2f..0.45f, { if (it < -0.005f) "мягкий доезд" else "${(it * 100).roundToInt()}%" }) { v -> update(true) { closeDamping = 1f - v } }
+        Group(s(R.string.anim_close)) {
+            SliderRow(s(R.string.anim_speed), a.closeStiffness, 120f..1200f, { s(R.string.anim_settle_ms, settleMs(it, a.closeDamping)) }) { v -> update(true) { closeStiffness = v } }
+            SliderRow(s(R.string.anim_bounce), 1f - a.closeDamping, -0.2f..0.45f, { if (it < -0.005f) s(R.string.anim_no_bounce) else "${(it * 100).roundToInt()}%" }) { v -> update(true) { closeDamping = 1f - v } }
         }
-        Group("Рабочий стол") {
-            SliderRow("Отдаление при открытии", 1f - a.homeScale, 0f..0.2f, { "${(it * 100).roundToInt()}%" }) { v -> update(true) { homeScale = 1f - v } }
-            SwitchRow("Обои уходят вглубь", a.depth) { v -> update(true) { depth = v } }
+        Group(s(R.string.anim_home)) {
+            SliderRow(s(R.string.anim_home_scale), 1f - a.homeScale, 0f..0.2f, { "${(it * 100).roundToInt()}%" }) { v -> update(true) { homeScale = 1f - v } }
+            SwitchRow(s(R.string.anim_depth_wallpaper), a.depth) { v -> update(true) { depth = v } }
             Text(
-                "Меняется сразу. Если стол не отдаляется — перезапусти лаунчер.",
+                s(R.string.anim_home_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 6.dp, bottom = 10.dp)
             )
-            Button(if (restarted) "Лаунчер перезапущен" else "Перезапустить лаунчер", primary = false) {
+            Button(if (restarted) s(R.string.anim_launcher_restarted) else s(R.string.anim_restart_launcher), primary = false) {
                 scope.launch {
                     restarted = withContext(Dispatchers.IO) {
                         runCatching {
@@ -166,62 +166,62 @@ internal fun AnimTab() {
                 }
             }
         }
-        Group("Стол, меню и шторка") {
-            SliderRow("Размытие стола за приложением", a.homeBlur, 0f..48f, { if (it < 1f) "выкл" else "${it.roundToInt()} dp" }) { v -> update(false) { homeBlur = if (v < 1f) 0f else v } }
-            SwitchRow("Растягивать значки как виджеты", a.iconResize) { v -> update(false) { iconResize = v } }
-            Text("Долгое нажатие на значок → «Увеличить»: 2×1, 3×1, 4×1, 1×2, 1×3, 2×2.", style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp))
-            Label("Открытие меню приложений")
+        Group(s(R.string.anim_home_drawer_shade)) {
+            SliderRow(s(R.string.anim_home_blur), a.homeBlur, 0f..48f, { if (it < 1f) s(R.string.off) else "${it.roundToInt()} dp" }) { v -> update(false) { homeBlur = if (v < 1f) 0f else v } }
+            SwitchRow(s(R.string.anim_icon_resize), a.iconResize) { v -> update(false) { iconResize = v } }
+            Text(s(R.string.anim_icon_resize_hint), style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp))
+            Label(s(R.string.anim_drawer_open))
             val drawers = listOf(AnimPrefs.NOTHING, AnimPrefs.ORIGIN, AnimPrefs.IOS)
             Segmented(listOf("Nothing", "OriginOS", "iOS"), drawers.indexOf(a.drawer).coerceAtLeast(0)) { i -> update(false) { drawer = drawers[i] } }
-            SwitchRow("Раздельная шторка, как в NOS 5", a.splitShade) { v -> update(false) { splitShade = v } }
-            Text("Свайп из правой половины строки состояния — быстрые настройки, из левой — уведомления.", style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp))
-            Label("Открытие шторки")
+            SwitchRow(s(R.string.anim_split_shade), a.splitShade) { v -> update(false) { splitShade = v } }
+            Text(s(R.string.anim_split_shade_hint), style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp))
+            Label(s(R.string.anim_shade_open))
             val shades = listOf(AnimPrefs.NOTHING, AnimPrefs.ORIGIN, AnimPrefs.COLOROS, AnimPrefs.IOS)
             Segmented(listOf("Nothing", "OriginOS", "ColorOS", "iOS"), shades.indexOf(a.shade).coerceAtLeast(0)) { i -> update(false) { shade = shades[i] } }
-            Text("Шторка — после перезагрузки, остальное — сразу.", style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp))
-            Label("Живой стол, папки, громкость, нажатия")
+            Text(s(R.string.anim_shade_hint), style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp))
+            Label(s(R.string.anim_living))
             val motions = listOf(AnimPrefs.NOTHING, AnimPrefs.COLOROS17)
             Segmented(listOf("Nothing", "ColorOS 17"), motions.indexOf(a.sysMotion).coerceAtLeast(0)) { i -> update(false) { sysMotion = motions[i] } }
             Text(
-                "Закрытое приложение пускает волну по столу, после разблокировки значки опускаются ряд за рядом, меню выплывает рядами, папки раскрываются каскадом, шторка тянется как резина, плитки сжимаются под пальцем.",
+                s(R.string.anim_living_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp)
             )
-            SwitchRow("Гравитация на столе", a.gravity) { v -> update(false) { gravity = v } }
+            SwitchRow(s(R.string.anim_gravity), a.gravity) { v -> update(false) { gravity = v } }
             Text(
-                "Встряхни телефон на рабочем столе — значки и виджеты падают и складываются в кучу, наклон телефона их пересыпает. Значки можно хватать и бросать, касание — открыть. Ещё встряхнуть или «домой» — всё на места.",
+                s(R.string.anim_gravity_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp)
             )
-            Label("Панель громкости")
+            Label(s(R.string.anim_volume))
             val volumes = listOf(AnimPrefs.NOTHING, AnimPrefs.COLOROS, AnimPrefs.IOS)
             Segmented(listOf("Nothing", "ColorOS", "iPhone"), volumes.indexOf(a.volume).coerceAtLeast(0)) { i -> update(false) { volume = volumes[i] } }
             Text(
                 when (a.volume) {
-                    AnimPrefs.IOS -> "Своя панель как на iPhone: стеклянная капсула у края. Выезжает пружиной, вздрагивает на каждое нажатие, через секунду сжимается в тонкую линию; громкость можно тянуть пальцем, на краях шкалы капсула тянется как резина. Кнопки режима звонка и других потоков тут нет — они в шторке."
-                    AnimPrefs.COLOROS -> "Вырастает от края из половины размера, на краю шкалы тянется как резина."
-                    else -> "Как в Nothing OS."
+                    AnimPrefs.IOS -> s(R.string.anim_volume_ios)
+                    AnimPrefs.COLOROS -> s(R.string.anim_volume_coloros)
+                    else -> s(R.string.anim_volume_nothing)
                 },
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp)
             )
         }
-        Group("Внутри приложений") {
-            Text("Переход между экранами и между приложениями", style = t(12, c = Dim), modifier = Modifier.padding(top = 4.dp, bottom = 10.dp))
-            Segmented(listOf("Система", "iOS 26", "ColorOS", "Origin"), IN_APP.indexOf(a.inApp).coerceAtLeast(0)) { i ->
+        Group(s(R.string.anim_in_app)) {
+            Text(s(R.string.anim_in_app_hint), style = t(12, c = Dim), modifier = Modifier.padding(top = 4.dp, bottom = 10.dp))
+            Segmented(listOf(s(R.string.anim_system), "iOS 26", "ColorOS", "Origin"), IN_APP.indexOf(a.inApp).coerceAtLeast(0)) { i ->
                 update(false) { inApp = IN_APP[i] }
             }
             if (a.inApp != AnimPrefs.IN_NATIVE) {
-                SliderRow("Длительность", a.inAppSpeed, 0.5f..2f, { "×%.2f".format(it) }) { v -> update(false) { inAppSpeed = v } }
+                SliderRow(s(R.string.anim_duration), a.inAppSpeed, 0.5f..2f, { "×%.2f".format(it) }) { v -> update(false) { inAppSpeed = v } }
             }
         }
-        Group("Вся система") {
-            SliderRow("Скорость анимаций", sys, 0f..2f, { if (it < 0.05f) "выкл" else "×%.2f".format(it) }) { v ->
+        Group(s(R.string.anim_whole_system)) {
+            SliderRow(s(R.string.anim_scale), sys, 0f..2f, { if (it < 0.05f) s(R.string.off) else "×%.2f".format(it) }) { v ->
                 sys = (v * 20).roundToInt() / 20f
                 sysVersion++
             }
-            Text("То же, что «Масштаб анимации» в параметрах разработчика. Меньше — быстрее.", style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp))
+            Text(s(R.string.anim_scale_hint), style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp))
         }
         if (!canApply(ctx)) {
             Text(
-                "Чтобы приложение могло менять анимации, один раз выдай доступ:\nadb shell pm grant dev.novacain.ntclocks android.permission.WRITE_SECURE_SETTINGS",
+                s(R.string.anim_grant_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 12.dp)
             )
         }
@@ -398,11 +398,11 @@ private fun AppContent(tint: Color, a: AnimPrefs, t: Float, pushed: Boolean, mod
         }
         val running = t < 1f
         if (pushed) {
-            Screen(tint, "Главная", if (running) Modifier.frame(frame(anims.getValue(5), w, h, t)) else Modifier.graphicsLayer { alpha = 0f }, onRow)
-            Screen(tint, "Подробно", Modifier.frame(frame(anims.getValue(4), w, h, t)), onRow)
+            Screen(tint, s(R.string.anim_demo_main), if (running) Modifier.frame(frame(anims.getValue(5), w, h, t)) else Modifier.graphicsLayer { alpha = 0f }, onRow)
+            Screen(tint, s(R.string.anim_demo_detail), Modifier.frame(frame(anims.getValue(4), w, h, t)), onRow)
         } else {
-            Screen(tint, "Главная", if (running) Modifier.frame(frame(anims.getValue(6), w, h, t)) else Modifier, onRow)
-            if (running) Screen(tint, "Подробно", Modifier.frame(frame(anims.getValue(7), w, h, t)), onRow)
+            Screen(tint, s(R.string.anim_demo_main), if (running) Modifier.frame(frame(anims.getValue(6), w, h, t)) else Modifier, onRow)
+            if (running) Screen(tint, s(R.string.anim_demo_detail), Modifier.frame(frame(anims.getValue(7), w, h, t)), onRow)
         }
     }
 }
@@ -424,14 +424,14 @@ private fun Screen(tint: Color, title: String, modifier: Modifier, onRow: () -> 
 
 
 /** Пресеты анимаций: название и характер в одну строку; выбранный — с акцентной рамкой. */
-private val PRESET_INFO = listOf(
-    Triple(AnimPrefs.NOTHING, "Nothing", "родные, ровные"),
-    Triple(AnimPrefs.IOS, "iOS 26", "мягко, лёгкий отскок"),
-    Triple(AnimPrefs.COLOROS, "ColorOS", "точно как в ColorOS 16"),
-    Triple(AnimPrefs.COLOROS_FAST, "ColorOS · быстро", "их режим «Быстрая»"),
-    Triple(AnimPrefs.COLOROS17, "ColorOS 17", "вся система: окна, шторка, папки, громкость, разблокировка"),
-    Triple(AnimPrefs.ORIGIN, "OriginOS 17", "упруго, стол в размытии"),
-    Triple(AnimPrefs.CUSTOM, "Свои", "твои ползунки"),
+private val PRESET_INFO get() = listOf(
+    Triple(AnimPrefs.NOTHING, "Nothing", s(R.string.preset_nothing)),
+    Triple(AnimPrefs.IOS, "iOS 26", s(R.string.preset_ios)),
+    Triple(AnimPrefs.COLOROS, "ColorOS", s(R.string.preset_coloros)),
+    Triple(AnimPrefs.COLOROS_FAST, s(R.string.preset_coloros_fast_name), s(R.string.preset_coloros_fast)),
+    Triple(AnimPrefs.COLOROS17, "ColorOS 17", s(R.string.preset_coloros17)),
+    Triple(AnimPrefs.ORIGIN, "OriginOS 17", s(R.string.preset_origin)),
+    Triple(AnimPrefs.CUSTOM, s(R.string.preset_custom_name), s(R.string.preset_custom)),
 )
 
 @Composable

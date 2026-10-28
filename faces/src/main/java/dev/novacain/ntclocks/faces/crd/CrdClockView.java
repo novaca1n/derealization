@@ -1,5 +1,7 @@
 package dev.novacain.ntclocks.faces.crd;
 
+import dev.novacain.ntclocks.faces.L;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -69,7 +71,7 @@ public final class CrdClockView extends FrameLayout implements ClockFace {
             int idx = indexOf(number);
             v = LayoutInflater.from(moduleContext(context)).inflate(CrdStyles.LAYOUTS[idx], this, false);
         } catch (Throwable t) {
-            Log.e(TAG, "стиль crDroid " + number + " не раскрылся", t);
+            Log.e(TAG, "crDroid style " + number + " failed to inflate", t);
             v = new View(context);
         }
         content = v;
@@ -140,7 +142,7 @@ public final class CrdClockView extends FrameLayout implements ClockFace {
                     v.playAnimation();
                 }
             } catch (Throwable e) {
-                Log.w(TAG, "анимация " + s + ": " + e);
+                Log.w(TAG, "animation " + s + ": " + e);
             }
         }
     }
@@ -154,7 +156,7 @@ public final class CrdClockView extends FrameLayout implements ClockFace {
                 n = ((UserManager) getContext().getSystemService(Context.USER_SERVICE)).getUserName();
             } catch (Throwable ignored) {
             }
-            name.setText(TextUtils.isEmpty(n) ? "Я" : n);
+            name.setText(TextUtils.isEmpty(n) ? L.t("Me", "Я") : n);
         }
         TextView device = root.findViewById(R.id.device_name);
         if (device != null) {

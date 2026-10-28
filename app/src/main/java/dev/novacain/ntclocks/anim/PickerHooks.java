@@ -41,7 +41,7 @@ public final class PickerHooks {
         // секции по классу (instanceof h7.g / h7.k), поэтому свою секцию не добавить — дописываем кнопку в их ряд
         Class<?> group = XposedHelpers.findClassIfExists("h7.c", cl);
         if (group == null) {
-            XposedBridge.log("ntweaker: «Обои и стиль» — ряд кнопок не найден");
+            XposedBridge.log("derealization: Wallpaper & style — button row not found");
             return;
         }
         XC_MethodHook add = new XC_MethodHook() {
@@ -54,13 +54,13 @@ public final class PickerHooks {
                     boolean lock = p.thisObject.getClass().getName().equals("h7.k");
                     addButton(row, (Context) p.args[1], lock ? "lock" : "home");
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: «Обои и стиль» — " + t);
+                    XposedBridge.log("derealization: Wallpaper & style — " + t);
                 }
             }
         };
         int n = Hook.all(group, "g", add).size();
         if (n == 0) Hook.all(group, "c", add);
-        XposedBridge.log("ntweaker: derealization в «Обоях и стиле» подключён");
+        XposedBridge.log("derealization: settings in Wallpaper & style hooked");
     }
 
     private static final String TAG = "derealization";
@@ -87,7 +87,7 @@ public final class PickerHooks {
             try {
                 v.getContext().startActivity(new Intent().setClassName(PKG, SETTINGS).putExtra("section", screen));
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: открыть настройки — " + t);
+                XposedBridge.log("derealization: open settings — " + t);
             }
         });
         row.addView(opt, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f));

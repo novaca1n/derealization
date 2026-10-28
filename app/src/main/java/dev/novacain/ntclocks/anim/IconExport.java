@@ -58,11 +58,11 @@ public final class IconExport {
                         }
                     }, new IntentFilter(ACTION), Context.RECEIVER_EXPORTED);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: значки для Hive — " + t);
+                    XposedBridge.log("derealization: Hive icons — " + t);
                 }
                 worker().postDelayed(() -> {
                     boolean has = installed(app);
-                    XposedBridge.log("ntweaker: значки для Hive — Hive " + (has ? "есть" : "не видна"));
+                    XposedBridge.log("derealization: Hive icons — Hive " + (has ? "present" : "not visible"));
                     if (has) export(app, 0);
                 }, 8000);
             }
@@ -95,7 +95,7 @@ public final class IconExport {
     }
 
     private static void run(Context ctx, int px) {
-        XposedBridge.log("ntweaker: значки для Hive — выгрузка, " + px + " px");
+        XposedBridge.log("derealization: Hive icons — export, " + px + " px");
         Object cache, flag;
         Class<?> appInfo;
         Handler model;
@@ -108,7 +108,7 @@ public final class IconExport {
             // кэш значков разрешает доступ только из своего потока (BaseIconCache.bgLooper)
             model = new Handler((android.os.Looper) XposedHelpers.getObjectField(cache, "bgLooper"));
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: значки для Hive, кэш значков — " + t);
+            XposedBridge.log("derealization: Hive icons, icon cache — " + t);
             return;
         }
         LauncherApps la = ctx.getSystemService(LauncherApps.class);
@@ -155,13 +155,13 @@ public final class IconExport {
                     try {
                         ctx.getContentResolver().call(INBOX, "put", key, e);
                     } catch (IllegalArgumentException t) {
-                        XposedBridge.log("ntweaker: значки для Hive — Hive не отвечает: " + t);
+                        XposedBridge.log("derealization: Hive icons — Hive isn't answering: " + t);
                         return;                                        // Hive не установлена
                     }
                     keys.add(key);
                     sent++;
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: значки для Hive, " + lai.getComponentName() + " — " + t);
+                    XposedBridge.log("derealization: Hive icons, " + lai.getComponentName() + " — " + t);
                 }
             }
         }
@@ -171,6 +171,6 @@ public final class IconExport {
             ctx.getContentResolver().call(INBOX, "done", null, e);
         } catch (Throwable ignored) {
         }
-        XposedBridge.log("ntweaker: значки для Hive отправлены — " + sent);
+        XposedBridge.log("derealization: Hive icons sent — " + sent);
     }
 }

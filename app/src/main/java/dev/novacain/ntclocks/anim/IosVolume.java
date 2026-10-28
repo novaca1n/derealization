@@ -91,7 +91,7 @@ final class IosVolume {
             current = new WeakReference<>(h);
             return h;
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: громкость iPhone — " + t);
+            XposedBridge.log("derealization: iPhone volume — " + t);
             detach(dlg);
             return null;
         }
@@ -279,7 +279,7 @@ final class IosVolume {
                 else fill.snap(f);
                 kick();
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: громкость iPhone, уровень — " + t);
+                XposedBridge.log("derealization: iPhone volume, level — " + t);
             }
         }
 
@@ -415,7 +415,7 @@ final class IosVolume {
                 });
                 XposedHelpers.callMethod(vri, "registerRtFrameCallback", cb);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: громкость iPhone, стекло — " + t);
+                XposedBridge.log("derealization: iPhone volume, glass — " + t);
             }
         }
 
@@ -617,7 +617,7 @@ final class IosVolume {
                 Object ctl = XposedHelpers.getObjectField(dlg, "mController");
                 XposedHelpers.callMethod(ctl, "setStreamVolume", XposedHelpers.getIntField(row, "stream"), level);
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: громкость iPhone, установка — " + t);
+                XposedBridge.log("derealization: iPhone volume, set — " + t);
             }
         }
 

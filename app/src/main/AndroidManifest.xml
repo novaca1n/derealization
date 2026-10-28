@@ -60,7 +60,7 @@
             android:name=".qs.BrightnessTile"
             android:exported="true"
             android:icon="@drawable/ic_tile_brightness"
-            android:label="Яркость"
+            android:label="@string/tile_brightness"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter><action android:name="android.service.quicksettings.action.QS_TILE" /></intent-filter>
         </service>
@@ -68,7 +68,7 @@
             android:name=".qs.VolumeTile"
             android:exported="true"
             android:icon="@drawable/ic_tile_volume"
-            android:label="Громкость"
+            android:label="@string/tile_volume"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter><action android:name="android.service.quicksettings.action.QS_TILE" /></intent-filter>
         </service>

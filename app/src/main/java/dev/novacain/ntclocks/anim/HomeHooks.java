@@ -75,7 +75,7 @@ public final class HomeHooks {
         itemInfo = XposedHelpers.findClassIfExists("com.android.launcher3.model.data.ItemInfo", cl);
         folderIcon = XposedHelpers.findClassIfExists("com.android.launcher3.folder.FolderIcon", cl);
         if (bubble == null || itemInfo == null) {
-            XposedBridge.log("ntweaker: стол и док — не найдено");
+            XposedBridge.log("derealization: home and dock — not found");
             return;
         }
         fContainer = XposedHelpers.findField(itemInfo, "container");
@@ -113,7 +113,7 @@ public final class HomeHooks {
                     try {
                         dockGlass((ViewGroup) p.thisObject, (Canvas) p.args[0]);
                     } catch (Throwable t) {
-                        XposedBridge.log("ntweaker: док — " + t);
+                        XposedBridge.log("derealization: dock — " + t);
                     }
                 }
             });
@@ -143,12 +143,12 @@ public final class HomeHooks {
                     try {
                         if (twoFinger((View) p.thisObject, (MotionEvent) p.args[0])) p.setResult(true);
                     } catch (Throwable t) {
-                        XposedBridge.log("ntweaker: два пальца — " + t);
+                        XposedBridge.log("derealization: two fingers — " + t);
                     }
                 }
             });
         }
-        XposedBridge.log("ntweaker: стол и док подключены");
+        XposedBridge.log("derealization: home and dock hooked");
     }
 
     /** Контейнер значка (стол −100, док −101; у значка в папке — номер папки). */
@@ -272,7 +272,7 @@ public final class HomeHooks {
                     try {
                         XposedBridge.invokeOriginalMethod(onClick, null, new Object[]{v});
                     } catch (Throwable t) {
-                        XposedBridge.log("ntweaker: запуск из дока — " + t);
+                        XposedBridge.log("derealization: launch from dock — " + t);
                     }
                     v.animate().translationY(0f).setDuration(420).setInterpolator(new OvershootInterpolator(2.2f))
                             .withEndAction(() -> XposedHelpers.removeAdditionalInstanceField(v, "ntBounce")).start();
@@ -293,7 +293,7 @@ public final class HomeHooks {
                 fired = false;
                 return false;
             case MotionEvent.ACTION_POINTER_DOWN:
-                if (DEBUG) XposedBridge.log("ntweaker: два пальца — " + e.getPointerCount() + " на столе " + onHome(layer) + " " + layer.getClass().getName());
+                if (DEBUG) XposedBridge.log("derealization: two fingers — " + e.getPointerCount() + " on home " + onHome(layer) + " " + layer.getClass().getName());
                 if (e.getPointerCount() == 2 && onHome(layer)) {
                     tracking = true;
                     startY = (e.getY(0) + e.getY(1)) / 2f;
@@ -338,7 +338,7 @@ public final class HomeHooks {
             Object top = XposedHelpers.callStaticMethod(XposedHelpers.findClass("com.android.launcher3.AbstractFloatingView", cl), "getTopOpenView", launcher);
             return top == null;
         } catch (Throwable t) {
-            if (DEBUG) XposedBridge.log("ntweaker: два пальца, состояние — " + t);
+            if (DEBUG) XposedBridge.log("derealization: two fingers, state — " + t);
             return false;
         }
     }

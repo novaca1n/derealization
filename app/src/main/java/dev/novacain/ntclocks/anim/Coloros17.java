@@ -68,7 +68,7 @@ public final class Coloros17 {
     public static void launcher(ClassLoader cl) {
         Class<?> folder = XposedHelpers.findClassIfExists("com.android.launcher3.folder.NTFolderAnimationManager", cl);
         if (folder == null) {
-            XposedBridge.log("ntweaker: ColorOS 17 — анимация папок не найдена");
+            XposedBridge.log("derealization: ColorOS 17 — folder animation not found");
             return;
         }
         // getAnimator собирает всё раскрытие/закрытие в один AnimatorSet — после него перенастраиваем каждую часть
@@ -81,7 +81,7 @@ public final class Coloros17 {
                 stagger((AnimatorSet) p.getResult(), opening);
             }
         });
-        XposedBridge.log("ntweaker: ColorOS 17 — папки подключены");
+        XposedBridge.log("derealization: ColorOS 17 — folders hooked");
     }
 
     /**
@@ -170,7 +170,7 @@ public final class Coloros17 {
         Class<?> props = XposedHelpers.findClassIfExists("com.android.systemui.statusbar.notification.stack.AnimationProperties", cl);
         Class<?> interp = XposedHelpers.findClassIfExists("com.android.app.animation.Interpolators", cl);
         if (props == null || interp == null) {
-            XposedBridge.log("ntweaker: ColorOS 17 — уведомления не найдены");
+            XposedBridge.log("derealization: ColorOS 17 — notifications not found");
             return;
         }
         Object fosi = XposedHelpers.getStaticObjectField(interp, "FAST_OUT_SLOW_IN");
@@ -219,7 +219,7 @@ public final class Coloros17 {
                 flyUp(v);
             }
         });
-        XposedBridge.log("ntweaker: ColorOS 17 — уведомления подключены");
+        XposedBridge.log("derealization: ColorOS 17 — notifications hooked");
     }
 
     /**
@@ -231,7 +231,7 @@ public final class Coloros17 {
     private static void unlock(ClassLoader cl) {
         Class<?> c = XposedHelpers.findClassIfExists("com.android.systemui.keyguard.KeyguardUnlockAnimationController", cl);
         if (c == null) {
-            XposedBridge.log("ntweaker: ColorOS 17 — разблокировка не найдена");
+            XposedBridge.log("derealization: ColorOS 17 — unlock not found");
             return;
         }
         Hook.ctors(c, new XC_MethodHook() {
@@ -249,7 +249,7 @@ public final class Coloros17 {
                 if (app != null) app.sendBroadcast(new android.content.Intent(HomeWave.ACTION_UNLOCK).setPackage("com.nothing.launcher"));
             }
         });
-        XposedBridge.log("ntweaker: ColorOS 17 — разблокировка подключена");
+        XposedBridge.log("derealization: ColorOS 17 — unlock hooked");
     }
 
     private static final class DropMatrix extends android.graphics.Matrix {
@@ -282,7 +282,7 @@ public final class Coloros17 {
     private static void volume(ClassLoader cl) {
         Class<?> dlg = XposedHelpers.findClassIfExists("com.android.systemui.volume.VolumeDialogImpl", cl);
         if (dlg == null) {
-            XposedBridge.log("ntweaker: ColorOS 17 — панель громкости не найдена");
+            XposedBridge.log("derealization: ColorOS 17 — volume panel not found");
             return;
         }
         Hook.all(dlg, "lambda$initDialog$4", new XC_MethodHook() {
@@ -395,7 +395,7 @@ public final class Coloros17 {
                         if (was) IosVolume.press(p.thisObject, stuck && max, stuck && min);
                     } else if (stuck && (max || min)) rubber(sb, max);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: ColorOS 17 — растяжение громкости — " + t);
+                    XposedBridge.log("derealization: ColorOS 17 — volume stretch — " + t);
                 }
             }
         });
@@ -406,7 +406,7 @@ public final class Coloros17 {
                 if (AnimPrefs.IOS.equals(vol())) IosVolume.sync(p.thisObject);
             }
         });
-        XposedBridge.log("ntweaker: ColorOS 17 — панель громкости подключена");
+        XposedBridge.log("derealization: ColorOS 17 — volume panel hooked");
     }
 
     private static final int DROP_TAG = 0x7e4e5404;
@@ -546,7 +546,7 @@ public final class Coloros17 {
     private static void tiles(ClassLoader cl) {
         Class<?> tile = XposedHelpers.findClassIfExists("com.android.systemui.qs.tileimpl.QSTileViewImpl", cl);
         if (tile == null) {
-            XposedBridge.log("ntweaker: ColorOS 17 — плитки не найдены");
+            XposedBridge.log("derealization: ColorOS 17 — tiles not found");
             return;
         }
         Hook.all(tile, "onTouchEvent", new XC_MethodHook() {
@@ -567,7 +567,7 @@ public final class Coloros17 {
                 }
             }
         });
-        XposedBridge.log("ntweaker: ColorOS 17 — нажатия на плитки подключены");
+        XposedBridge.log("derealization: ColorOS 17 — tile presses hooked");
     }
 
     private static void press(View v, boolean down) {

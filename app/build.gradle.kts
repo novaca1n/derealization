@@ -19,8 +19,8 @@ android {
         applicationId = "dev.novacain.ntclocks"
         minSdk = 36          // только Nothing OS 4.1 (Android 16) — под неё и сделан модуль
         targetSdk = 36
-        versionCode = 45
-        versionName = "3.8"
+        versionCode = 50
+        versionName = "4.0"
     }
     signingConfigs {
         if (keyProps.isNotEmpty()) create("release") {

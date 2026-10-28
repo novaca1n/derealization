@@ -40,35 +40,18 @@ enum class NewsIcon { Motion, Blur, Drawer, Shade, Home, Sheet, Clock, Resize, S
 
 data class News(val icon: NewsIcon, val title: String, val text: String)
 
-/** Что нового в текущей версии (показывается один раз после установки или обновления). */
-val NEWS = listOf(
-    News(NewsIcon.Home, "Гравитация на столе", "Встряхни телефон на рабочем столе — значки, папки и виджеты падают и складываются в кучу, наклон телефона их пересыпает. Значки можно хватать и бросать, касание открывает. Ещё раз встряхнуть или «домой» — всё на места. Включается в «Анимациях»"),
-    News(NewsIcon.Motion, "Панель громкости как на iPhone", "Стеклянная капсула у края экрана: выезжает пружиной, вздрагивает на каждое нажатие, через секунду сжимается в тонкую линию и уезжает. Громкость можно тянуть пальцем, на краях капсула тянется как резина. Включается в «Анимациях» → «Панель громкости» → iPhone"),
-    News(NewsIcon.Motion, "Недавние — карусель с глубиной", "В переключателе приложений карточки по бокам меньше и тусклее и плавно вырастают, подъезжая к центру, — как в iOS"),
-    News(NewsIcon.Shade, "Уведомление как на iPhone", "Всплывающее уведомление падает целиком из-за верхнего края, садится с упругим перелётом и так же улетает вверх, когда прячется"),
-    News(NewsIcon.Motion, "Меню, папки и шторка оживают", "Меню приложений выплывает рядами за пальцем, значки папки раскрываются каскадом, а шторку можно потянуть дальше конца — она тянется как резина и пружинит обратно"),
-    News(NewsIcon.Home, "Живой стол", "Окно садится в значок — по столу пробегает едва заметная волна. После разблокировки значки опускаются на места ряд за рядом"),
-    News(NewsIcon.Motion, "Шторка без рывка", "Окно шторки готовится уже в момент касания строки состояния — первый кадр шторки в 3–5 раз быстрее"),
-    News(NewsIcon.Motion, "Резиновая громкость", "На максимуме или минимуме очередное нажатие упруго вытягивает ползунок за край — как в ColorOS"),
-    News(NewsIcon.Motion, "Окно ведёт дальний край", "Значок внизу экрана — окно сначала дотягивается вверх, значок вверху — вниз; и при открытии, и при закрытии. Посередине края идут вровень"),
-    News(NewsIcon.Motion, "Ровнее кадры", "Размытие стола теперь считается на уменьшенной копии — лаунчер рисует кадр вдвое быстрее; шторка теряет на четверть меньше кадров, чем у Nothing без модуля"),
-    News(NewsIcon.Motion, "Вся система — ColorOS 17", "Пресет «ColorOS 17» теперь меняет не только окна: папки раскрываются пружинами ColorOS, панель громкости вырастает от края с отскоком, плитки упруго сжимаются под пальцем, после разблокировки стол опускается на место, а часы остаются"),
-    News(NewsIcon.Home, "Док-стекло заработало", "Стекло под значками дока не рисовалось вовсе — хук висел на методе, которого у дока нет. Теперь рисуется и размывает обои само, без нагрузки на композитор"),
-    News(NewsIcon.Motion, "Плавнее", "Прозрачные папки, виджеты и док размывают обои сами — системному композитору больше не нужно пересчитывать размытие каждый кадр. Открытая папка садится в полупрозрачный значок без скачка"),
-    News(NewsIcon.Sheet, "Виджеты в Material 3", "Цвета системы, волнистое кольцо шагов, обложка-«печенье», волнистый прогресс трека и кнопка, меняющая форму"),
-    News(NewsIcon.Resize, "Растягивание за угол", "Долгое нажатие на значок или папку — рамка с ручкой, тяни за угол, как виджет. Папка — ещё и капсулой 2×1"),
-    News(NewsIcon.Home, "Стол и док", "Док-стекло как в iOS 26 с подпрыгиванием значка, подписи без дока или шрифтом Ndot, два пальца вниз — быстрые настройки"),
-    News(NewsIcon.Motion, "Разблокировка как в iOS", "Свайп вверх или отпечаток — часы и виджеты уезжают вверх и растворяются, объект с обоев остаётся"),
-    News(NewsIcon.Clock, "Своя маска глубины", "Любое фото на экран блокировки: объект выделится сам, поправь пальцем — и он встанет поверх часов. Видно настоящие часы и линию подрезки"),
-    News(NewsIcon.Sheet, "Раздел «Глубина»", "В «Обоях и стиле» → экран блокировки: своя маска, глубина без запретов Nothing, подрезка под большие часы"),
-    News(NewsIcon.Motion, "Патчер как Dopamine", "Меню-карточка, лист с журналом «как текст песни», затемнение в конце; фон — акцентные цвета системы"),
-    News(NewsIcon.Sheet, "Безопасный режим", "Упало три раза подряд — derealization в этом процессе сам выключится; «Патч» вернёт"),
-    News(NewsIcon.Home, "«О телефоне» с карточкой", "Живой фон в цветах системы, Nothing OS и версия, patched with derealization"),
-    News(NewsIcon.Home, "Теперь это derealization", "Приложение — только патчер: «Патч» внедряет код в SystemUI, лаунчер и «Обои и стиль», «Снять патч» возвращает всё как у Nothing"),
-    News(NewsIcon.Sheet, "Настройки — в «Обоях и стиле»", "Главный экран: «Анимации», «Стекло», «Цвета»; экран блокировки: «Часы», «Стекло»"),
-    News(NewsIcon.Resize, "Значки растягиваются как виджеты", "Долгое нажатие → «Увеличить»: 2×1, 3×1, 4×1, 1×2, 1×3 или 2×2"),
-    News(NewsIcon.Split, "Раздельная шторка, как в NOS 5", "Свайп из правой половины — быстрые настройки, из левой — уведомления"),
-    News(NewsIcon.Shade, "Шторка и меню в стиле iOS", "Панель мягко догоняет палец, меню приложений наплывает"),
+/** Что нового в текущей версии (показывается один раз после установки или обновления). Getter — текст на языке телефона. */
+val NEWS get() = listOf(
+    News(NewsIcon.Sheet, s(R.string.news_store), s(R.string.news_store_text)),
+    News(NewsIcon.Clock, s(R.string.news_clocks), s(R.string.news_clocks_text)),
+    News(NewsIcon.Clock, s(R.string.news_depth), s(R.string.news_depth_text)),
+    News(NewsIcon.Motion, s(R.string.news_motion), s(R.string.news_motion_text)),
+    News(NewsIcon.Shade, s(R.string.news_ios), s(R.string.news_ios_text)),
+    News(NewsIcon.Home, s(R.string.news_home), s(R.string.news_home_text)),
+    News(NewsIcon.Resize, s(R.string.news_resize), s(R.string.news_resize_text)),
+    News(NewsIcon.Split, s(R.string.news_glass), s(R.string.news_glass_text)),
+    News(NewsIcon.Sheet, s(R.string.news_settings), s(R.string.news_settings_text)),
+    News(NewsIcon.Home, s(R.string.news_safe), s(R.string.news_safe_text)),
 )
 
 object WhatsNewState {
@@ -102,8 +85,8 @@ fun WhatsNewScreen(firstRun: Boolean, version: String, onDone: () -> Unit) = App
             Spacer(Modifier.height(16.dp))
             Appear {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(if (firstRun) "Добро пожаловать" else "Обновлено", style = t(34, FontWeight.SemiBold))
-                    Text(if (firstRun) "derealization $version" else "derealization $version — что нового", style = t(15, c = Dim), modifier = Modifier.padding(top = 4.dp))
+                    Text(if (firstRun) s(R.string.news_welcome) else s(R.string.news_updated), style = t(34, FontWeight.SemiBold))
+                    Text(if (firstRun) "derealization $version" else s(R.string.news_whats_new, version), style = t(15, c = Dim), modifier = Modifier.padding(top = 4.dp))
                 }
             }
             Spacer(Modifier.height(24.dp))
@@ -124,7 +107,7 @@ fun WhatsNewScreen(firstRun: Boolean, version: String, onDone: () -> Unit) = App
             }
         }
         Box(Modifier.fillMaxWidth().padding(vertical = 18.dp).height(60.dp).clip(CircleShape).background(Color.White).clickable(onClick = onDone),
-            contentAlignment = Alignment.Center) { Text("Продолжить", style = t(18, FontWeight.SemiBold, Color.Black)) }
+            contentAlignment = Alignment.Center) { Text(s(R.string.action_continue), style = t(18, FontWeight.SemiBold, Color.Black)) }
     }
 }
 

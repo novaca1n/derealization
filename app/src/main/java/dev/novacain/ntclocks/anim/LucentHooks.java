@@ -181,7 +181,7 @@ public final class LucentHooks {
                         FOLDER_R.set(x, y, x + size, y + size);
                         LucentBlur.draw((android.graphics.Canvas) p.args[0], bg, owner, FOLDER_R, corner, l);
                     } catch (Throwable t) {
-                        XposedBridge.log("ntweaker: размытие папки — " + t);
+                        XposedBridge.log("derealization: folder blur — " + t);
                     }
                 }
 
@@ -262,7 +262,7 @@ public final class LucentHooks {
                 }
             });
         }
-        XposedBridge.log("ntweaker: прозрачные папки и виджеты подключены (хостов " + hosts.length + ")");
+        XposedBridge.log("derealization: translucent folders and widgets hooked (hosts: " + hosts.length + ")");
     }
 
     /** Фоны внутри виджета (до 3 уровней) — с нужной альфой; Drawable сначала mutate, чтобы не задеть общие. */
@@ -383,14 +383,14 @@ public final class LucentHooks {
                     String title = null;
                     if (folder) {
                         Object t = XposedHelpers.getObjectField(info, "title");
-                        title = t != null && t.toString().length() > 0 ? t.toString() : "Папка";
+                        title = t != null && t.toString().length() > 0 ? t.toString() : L.t("Folder", "Папка");
                     } else {
                         try {
                             ComponentName cn = (ComponentName) XposedHelpers.callMethod(info, "getTargetComponent");
                             if (cn != null) title = pm.getApplicationLabel(pm.getApplicationInfo(cn.getPackageName(), 0)).toString();
                         } catch (Throwable ignored) {
                         }
-                        if (title == null) title = "Виджет";
+                        if (title == null) title = L.t("Widget", "Виджет");
                     }
                     list.put(new JSONObject().put("id", itemId(v)).put("type", folder ? "folder" : "widget")
                             .put("title", title).put("page", i + 1));
@@ -401,7 +401,7 @@ public final class LucentHooks {
             lastList = json;
             a.getContentResolver().call(Uri.parse("content://dev.novacain.ntclocks.prefs"), "homeItems", json, null);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: список рабочего стола — " + t);
+            XposedBridge.log("derealization: home screen list — " + t);
         }
     }
 }

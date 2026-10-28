@@ -1,5 +1,6 @@
 package dev.novacain.ntclocks
 
+import androidx.compose.ui.graphics.drawscope.scale
 import android.content.Context
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -101,7 +102,7 @@ internal fun DereHome() {
         Patcher.vectorEnabled()?.let { on -> if (on == off) { Patcher.remember(ctx, on); off = !on } }
         safe = Patcher.safeMode()
         val f = Patcher.failures()
-        notes = listOfNotNull(Patcher.compatibility(ctx), if (f.isNotEmpty()) "Не встало: ${f.size} — ${f.first()}" else null)
+        notes = listOfNotNull(Patcher.compatibility(ctx), if (f.isNotEmpty()) s(R.string.home_failed_count, f.size, f.first()) else null)
         while (true) {
             sys = Alive.since(ctx, "com.android.systemui")
             launcher = Alive.since(ctx, "com.nothing.launcher")
@@ -140,7 +141,7 @@ internal fun DereHome() {
             }
             delay(500)
             if (ok) {
-                log += "Готово"
+                log += s(R.string.done)
                 done = true
                 off = j == Job.UNPATCH
                 if (j == Job.PATCH) safe = emptyList()
@@ -176,10 +177,10 @@ internal fun DereHome() {
             Column(Modifier.graphicsLayer { translationY = -25.dp.toPx() * menuShift }) {
                 Text("derealization", style = t(40, FontWeight.SemiBold, Color.White))
                 Text(system, style = t(14, FontWeight.Medium, Color.White), modifier = Modifier.padding(top = 2.dp))
-                Text("by NovaCain · Vector $versionName", style = t(14, c = Color.White.copy(alpha = 0.6f)))
+                Text("v$versionName · by novaca1n", style = t(14, c = Color.White.copy(alpha = 0.6f)))
                 val statusLine = when {
-                    safe.isNotEmpty() -> "Безопасный режим: ${safe.joinToString()}"
-                    !off && !(sys && launcher) -> "Пропатчено · ждёт перезапуска"
+                    safe.isNotEmpty() -> s(R.string.home_safe_mode, safe.joinToString())
+                    !off && !(sys && launcher) -> s(R.string.home_patched_waiting)
                     else -> null
                 }
                 (listOfNotNull(statusLine) + if (!off) notes else emptyList()).forEach {
@@ -196,18 +197,18 @@ internal fun DereHome() {
                 }.clip(RoundedCornerShape(16.dp)).background(MenuColor).padding(horizontal = 20.dp, vertical = 5.dp)
             ) {
                 val rows = buildList {
-                    add(Triple(Glyph.GEAR, "Настройки", true) to { openWallpaperStyle(ctx) })
+                    add(Triple(Glyph.GEAR, s(R.string.menu_settings), true) to { openWallpaperStyle(ctx) })
                     add(Triple(Glyph.STORE, ctx.getString(R.string.menu_store), true) to {
                         scope.launch(Dispatchers.IO) { Patcher.openStore(ctx) }
                     })
-                    add(Triple(Glyph.RESTART, "Перезапустить SystemUI", false) to {
+                    add(Triple(Glyph.RESTART, s(R.string.menu_restart_systemui), false) to {
                         fadeToBlack { withContext(Dispatchers.IO) { runCatching { Runtime.getRuntime().exec(arrayOf("su", "-c", "kill \$(pidof com.android.systemui)")).waitFor() } } }
                     })
-                    add(Triple(Glyph.POWER, "Перезагрузить", false) to {
+                    add(Triple(Glyph.POWER, s(R.string.menu_reboot), false) to {
                         fadeToBlack { withContext(Dispatchers.IO) { runCatching { Runtime.getRuntime().exec(arrayOf("su", "-c", "svc power reboot")).waitFor() } } }
                     })
-                    if (!repatch) add(Triple(Glyph.LOCK, "Снять патч", false) to { run(Job.UNPATCH) })
-                    add(Triple(Glyph.INFO, "Авторы", true) to { credits = true })
+                    if (!repatch) add(Triple(Glyph.LOCK, s(R.string.menu_unpatch), false) to { run(Job.UNPATCH) })
+                    add(Triple(Glyph.INFO, s(R.string.menu_credits), true) to { credits = true })
                 }
                 rows.forEachIndexed { i, (r, action) ->
                     MenuRow(r.first, r.second, r.third, i != rows.lastIndex, enabled = job == null) { action() }
@@ -225,7 +226,7 @@ internal fun DereHome() {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     GlyphIcon(Glyph.LOCK, Modifier.size(18.dp), open = true)
                     Spacer(Modifier.width(10.dp))
-                    Text(if (safe.isNotEmpty()) "Патч заново" else if (off) "Патч" else "Пропатчено",
+                    Text(if (safe.isNotEmpty()) s(R.string.home_repatch) else if (off) s(R.string.home_patch) else s(R.string.home_patched),
                         style = t(17, FontWeight.Medium, Color.White.copy(alpha = if (repatch) 1f else 0.7f)))
                 }
             }
@@ -251,7 +252,7 @@ internal fun DereHome() {
                 ) {
                     Helix(Modifier.width(30.dp).height(12.dp), done)
                     Spacer(Modifier.width(10.dp))
-                    Text(when { done -> if (job == Job.PATCH) "Пропатчено" else "Патч снят"; job == Job.PATCH -> "Патчу"; else -> "Снимаю патч" },
+                    Text(when { done -> if (job == Job.PATCH) s(R.string.home_patched) else s(R.string.home_unpatched); job == Job.PATCH -> s(R.string.home_patching); else -> s(R.string.home_unpatching) },
                         style = t(18, c = Color.White))
                 }
             }
@@ -311,6 +312,15 @@ private fun AccentBackground(energy: Float) {
 
 // ───────── меню ─────────
 
+/** Material Symbols «extension» (Apache-2.0). */
+private val StorePath by lazy {
+    androidx.compose.ui.graphics.vector.PathParser().parsePathString(
+        "M20.5,11H19V7c0,-1.1 -0.9,-2 -2,-2h-4V3.5C13,2.12 11.88,1 10.5,1S8,2.12 8,3.5V5H4c-1.1,0 -1.99,0.9 -1.99,2v3.8H3.5" +
+            "c1.49,0 2.7,1.21 2.7,2.7s-1.21,2.7 -2.7,2.7H2V20c0,1.1 0.9,2 2,2h3.8v-1.5c0,-1.49 1.21,-2.7 2.7,-2.7 1.49,0 2.7,1.21 2.7,2.7" +
+            "V22H17c1.1,0 2,-0.9 2,-2v-4h1.5c1.38,0 2.5,-1.12 2.5,-2.5S21.88,11 20.5,11z"
+    ).toPath()
+}
+
 private enum class Glyph { GEAR, STORE, RESTART, POWER, LOCK, INFO }
 
 @Composable
@@ -347,10 +357,11 @@ private fun DrawScope.drawGlyph(g: Glyph, c: Color, open: Boolean) {
             }
         }
         Glyph.STORE -> {
-            // сумка: корпус и ручка сверху
-            drawRoundRect(c, Offset(s * 0.16f, s * 0.36f), androidx.compose.ui.geometry.Size(s * 0.68f, s * 0.56f),
-                androidx.compose.ui.geometry.CornerRadius(s * 0.1f), style = st)
-            drawArc(c, 180f, 180f, false, Offset(s * 0.32f, s * 0.1f), androidx.compose.ui.geometry.Size(s * 0.36f, s * 0.44f), style = st)
+            // кусочек пазла (твик) — контур того же символа, что на значке TweakStore; путь в сетке 24×24
+            val k = s / 24f
+            scale(k, k, Offset.Zero) {
+                drawPath(StorePath, c, style = Stroke(2.1f, join = androidx.compose.ui.graphics.StrokeJoin.Round))
+            }
         }
         Glyph.RESTART -> {
             // ↻: дуга по часовой от 1 часа до ~11:30 (разрыв сверху), на конце — залитый треугольник по касательной
@@ -480,13 +491,15 @@ private fun Credits(version: String, onBack: () -> Unit) {
             Modifier.align(Alignment.Center).padding(horizontal = 30.dp).fillMaxWidth().clip(RoundedCornerShape(16.dp))
                 .background(MenuColor).clickable(enabled = false) {}.padding(20.dp)
         ) {
-            Text("derealization $version — Авторы", style = t(18, FontWeight.SemiBold, Color.White))
+            Text(s(R.string.credits_title, version), style = t(18, FontWeight.SemiBold, Color.White))
             Spacer(Modifier.height(12.dp))
             listOf(
-                "NovaCain" to "идея, вкус и испытания",
-                "Vector (LSPosed)" to "внедрение кода в процессы",
-                "Dopamine — opa334, tomt000" to "образец интерфейса",
-                "Geist — Vercel · Ndot — Nothing" to "шрифты",
+                "novaca1n" to s(R.string.credits_author),
+                "Vector (LSPosed)" to s(R.string.credits_vector),
+                "Dopamine — opa334, tomt000" to s(R.string.credits_dopamine),
+                "crDroid Android" to s(R.string.credits_crdroid),
+                "Box2D-lite — Erin Catto" to s(R.string.credits_box2d),
+                "Geist — Vercel · Ndot — Nothing" to s(R.string.credits_fonts),
             ).forEachIndexed { i, (a, b) ->
                 if (i > 0) Box(Modifier.fillMaxWidth().height(1.dp).background(Sep))
                 Column(Modifier.padding(vertical = 10.dp)) {

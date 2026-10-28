@@ -279,7 +279,7 @@ public abstract class ClockFaceView extends View implements ClockFace {
             drawClock(canvas, getWidth(), getHeight());
             canvas.restoreToCount(save);
         } catch (Throwable t) {
-            Log.e(TAG, "ошибка отрисовки " + getClass().getSimpleName(), t);
+            Log.e(TAG, "draw failed: " + getClass().getSimpleName(), t);
         }
     }
 

@@ -50,7 +50,7 @@ public final class AnimHooks {
                                 }
                             });
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: подписка на анимации — " + t);
+                    XposedBridge.log("derealization: animation settings watcher — " + t);
                 }
             }
             return prefs;
@@ -91,7 +91,7 @@ public final class AnimHooks {
         blurDimenId = r.getIdentifier("max_depth_blur_radius_enhanced", "dimen", LAUNCHER);
         blurIntId = r.getIdentifier("max_depth_blur_radius", "integer", LAUNCHER);
         floatIds = m;
-        XposedBridge.log("ntweaker: ресурсов анимаций лаунчера найдено " + m.size());
+        XposedBridge.log("derealization: launcher animation resources found: " + m.size());
         return m;
     }
 
@@ -201,7 +201,7 @@ public final class AnimHooks {
                 try {
                     p.args[0] = Overshoot.wrap(p.thisObject, l);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: обёртка пружины — " + t);
+                    XposedBridge.log("derealization: spring wrapper — " + t);
                 }
             }
         });
@@ -235,7 +235,7 @@ public final class AnimHooks {
                 return;
             }
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: потолок пружины — " + t);
+            XposedBridge.log("derealization: spring cap — " + t);
         }
     }
 
@@ -391,7 +391,7 @@ public final class AnimHooks {
                 m.setAccessible(true);
                 return m;
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: время кадра в нс недоступно — " + t);
+                XposedBridge.log("derealization: frame time in ns unavailable — " + t);
                 return null;
             }
         }
@@ -437,8 +437,8 @@ public final class AnimHooks {
                     boolean flung = Math.abs(vx) + Math.abs(vy) > 50f;
                     momX = flung ? Math.max(-12000f, Math.min(12000f, vx)) : 0f;
                     momY = flung ? Math.max(-12000f, Math.min(12000f, vy)) : 0f;
-                    if (pr.debug) android.util.Log.d("ntanim", String.format(java.util.Locale.ROOT, "старт %s %s v %.0f,%.0f px/с %s → %s",
-                            open ? "откр" : "закр", anim.getClass().getName(), vx, vy, s.toShortString(), t.toShortString()));
+                    if (pr.debug) android.util.Log.d("ntanim", String.format(java.util.Locale.ROOT, "start %s %s v %.0f,%.0f px/s %s → %s",
+                            open ? "open" : "close", anim.getClass().getName(), vx, vy, s.toShortString(), t.toShortString()));
                     // «ColorOS 17»: веса жёсткости краёв (лево, верх, право, низ). Опережает ДАЛЬНИЙ от иконки край — тот, кому
                     // дальше ехать: иконка в нижней половине — верх (и при открытии, и при закрытии), в верхней — низ.
                     // Перевес плавно растёт с удалением иконки от середины экрана (f = −1 у верха … 1 у низа), посередине
@@ -485,8 +485,8 @@ public final class AnimHooks {
                     stepJelly(eps, now);
                     jellyEff = (float) Math.max(jelly * (1 - pull), eps);
                 }
-                if (pr.debug) android.util.Log.d("ntanim", String.format(java.util.Locale.ROOT, "%s %.2f p %.4f  л %.4f в %.4f п %.4f н %.4f  инерция %.0f,%.0f  содержимое %.3f",
-                        open ? "откр" : "закр", sec * 1000, p, l, tp, r, b, ox, oy, jellyEff));
+                if (pr.debug) android.util.Log.d("ntanim", String.format(java.util.Locale.ROOT, "%s %.2f p %.4f  l %.4f t %.4f r %.4f b %.4f  momentum %.0f,%.0f  content %.3f",
+                        open ? "open" : "close", sec * 1000, p, l, tp, r, b, ox, oy, jellyEff));
                 return out;
             } catch (Throwable e) {
                 return null;
@@ -624,9 +624,9 @@ public final class AnimHooks {
                     hooked++;
                 }
             }
-            XposedBridge.log("ntweaker: отдаление стола — перехвачено методов " + hooked);
+            XposedBridge.log("derealization: home zoom — methods hooked: " + hooked);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: отдаление стола не найдено — " + t);
+            XposedBridge.log("derealization: home zoom not found — " + t);
         }
     }
 
@@ -650,9 +650,9 @@ public final class AnimHooks {
                     if (a.overridesLauncher() && a.depth) p.setResult(true);
                 }
             });
-            XposedBridge.log("ntweaker: глубина обоев подключена");
+            XposedBridge.log("derealization: wallpaper depth hooked");
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: глубина обоев не найдена — " + t);
+            XposedBridge.log("derealization: wallpaper depth not found — " + t);
         }
     }
 
@@ -662,7 +662,7 @@ public final class AnimHooks {
         try {
             hookWarp(cl);
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: искривление окна — " + t);
+            XposedBridge.log("derealization: window warp — " + t);
         }
         // Nothing стартует анимацию «домой» с нулевой скоростью (new PointF()), и окно после отпускания пальца трогается
         // с места. Настоящую скорость пальца берём из конца жеста — края окна продолжат движение по инерции
@@ -761,7 +761,7 @@ public final class AnimHooks {
         });
         homeContent(cl);
         depthGate(cl);
-        XposedBridge.log("ntweaker: анимации лаунчера подключены" + (spring == null ? " (без RectFSpringAnim!)" : ""));
+        XposedBridge.log("derealization: launcher animations hooked" + (spring == null ? " (no RectFSpringAnim!)" : ""));
     }
 
     // ───────── SystemUI / WM Shell ─────────
@@ -769,7 +769,7 @@ public final class AnimHooks {
     public static void shell() {
         Class<?> ta = XposedHelpers.findClassIfExists("com.android.internal.policy.TransitionAnimation", null);
         if (ta == null) {
-            XposedBridge.log("ntweaker: TransitionAnimation не найден — переходы остаются родными");
+            XposedBridge.log("derealization: TransitionAnimation not found — transitions stay stock");
             return;
         }
         XposedHelpers.findAndHookMethod(ta, "loadDefaultAnimationAttr", int.class, boolean.class, new XC_MethodHook() {
@@ -781,10 +781,10 @@ public final class AnimHooks {
                     Animation an = ShellAnims.create(a.inApp, (Integer) p.args[0], a.inAppSpeed);
                     if (an != null) p.setResult(an);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: переход — " + t);
+                    XposedBridge.log("derealization: transition — " + t);
                 }
             }
         });
-        XposedBridge.log("ntweaker: переходы WM Shell подключены");
+        XposedBridge.log("derealization: WM Shell transitions hooked");
     }
 }

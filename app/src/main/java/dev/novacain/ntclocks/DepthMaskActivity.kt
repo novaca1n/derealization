@@ -131,8 +131,8 @@ internal object DepthApply {
     fun remove(ctx: android.content.Context): String? = try {
         systemUi(ctx, "clear") ?: run { WallpaperManager.getInstance(ctx).clear(WallpaperManager.FLAG_LOCK); null }
     } catch (t: Throwable) {
-        android.util.Log.e("derealization", "убрать маску", t)
-        "Не получилось: ${(t.cause ?: t).javaClass.simpleName}"
+        android.util.Log.e("derealization", "remove mask", t)
+        s(R.string.mask_failed, (t.cause ?: t).javaClass.simpleName)
     }
 }
 
@@ -154,7 +154,7 @@ private fun systemUi(ctx: android.content.Context, what: String): String? {
         return if (res == "ok") null else "SystemUI: $res"
     }
     Settings.Global.putString(cr, dev.novacain.ntclocks.anim.DepthHooks.CUT_REQUEST, null)
-    return "SystemUI не ответил — патч включён?"
+    return s(R.string.mask_no_systemui)
 }
 
 @Composable
@@ -174,10 +174,10 @@ private fun MaskEditor(sw: Int, sh: Int, start: Uri?, onClose: () -> Unit) {
     var pickAgain by remember { mutableStateOf(false) }
     fun open(uri: Uri) {
         scope.launch {
-            busy = "Открываю фото"
+            busy = s(R.string.mask_opening)
             src = withContext(Dispatchers.IO) { runCatching { decode(ctx, uri, max(sw, sh) * 2) }.getOrNull() }
             busy = null
-            if (src != null) step = Step.PLACE else { note = "Не удалось открыть фото"; pickAgain = true }
+            if (src != null) step = Step.PLACE else { note = s(R.string.mask_open_failed); pickAgain = true }
         }
     }
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -203,14 +203,14 @@ private fun MaskEditor(sw: Int, sh: Int, start: Uri?, onClose: () -> Unit) {
             Step.PICK -> {}
             Step.PLACE -> Place(src!!, sw, sh, shot, onBack = onClose) { m ->
                 scope.launch {
-                    busy = "Выделяю объект"
+                    busy = s(R.string.mask_detecting)
                     val b = withContext(Dispatchers.Default) { render(src!!, m, sw, sh) }
                     big = b
                     val w = Bitmap.createBitmap(b, margin(sw), margin(sh), sw, sh)
                     wall = w
                     val auto = segment(ctx, w)
                     mask = auto ?: Bitmap.createBitmap(sw, sh, Bitmap.Config.ALPHA_8)
-                    note = if (auto == null) "Автовыделение недоступно — обведи объект пальцем" else null
+                    note = if (auto == null) s(R.string.mask_auto_unavailable_draw) else null
                     busy = null
                     step = Step.MASK
                 }
@@ -218,9 +218,9 @@ private fun MaskEditor(sw: Int, sh: Int, start: Uri?, onClose: () -> Unit) {
             Step.MASK -> MaskPaint(wall!!, mask!!, shot, onBack = { step = Step.PLACE },
                 onAuto = {
                     scope.launch {
-                        busy = "Выделяю объект"
+                        busy = s(R.string.mask_detecting)
                         val auto = segment(ctx, wall!!)
-                        if (auto != null) mask = auto else note = "Автовыделение недоступно"
+                        if (auto != null) mask = auto else note = s(R.string.mask_auto_unavailable)
                         busy = null
                     }
                 },
@@ -232,7 +232,7 @@ private fun MaskEditor(sw: Int, sh: Int, start: Uri?, onClose: () -> Unit) {
             if (DepthApply.done) { DepthApply.done = false; step = Step.DONE }
             DepthApply.error?.let { note = it; DepthApply.error = null; if (wall == null) onClose() }
         }
-        if (DepthApply.running) Busy("Ставлю обои")
+        if (DepthApply.running) Busy(s(R.string.mask_applying))
         busy?.let { Busy(it) }
         note?.let { n ->
             LaunchedEffect(n) { kotlinx.coroutines.delay(3500); note = null }
@@ -278,9 +278,9 @@ private fun Place(src: Bitmap, sw: Int, sh: Int, shot: ClockShot?, onBack: () ->
                 dstSize = IntSize((src.width * scale * k).toInt(), (src.height * scale * k).toInt()))
             clock(shot, k, sh * k, 0.6f)
         }
-        TopBar("Подгони фото", if (shot != null) "Часы — как на экране блокировки" else "Часы будут примерно здесь", onBack)
+        TopBar(s(R.string.mask_place), if (shot != null) s(R.string.mask_clock_real) else s(R.string.mask_clock_approx), onBack)
         BottomBar {
-            Pill("Дальше", primary = true, Modifier.fillMaxWidth()) {
+            Pill(s(R.string.action_next), primary = true, Modifier.fillMaxWidth()) {
                 onNext(Matrix().apply { setScale(scale, scale); postTranslate(off.x, off.y) })
             }
         }
@@ -389,38 +389,38 @@ private fun MaskPaint(wall: Bitmap, mask: Bitmap, shot: ClockShot?, onBack: () -
             }
             cursor?.let { drawCircle(Color.White, brush * size.width / 2, it, style = Stroke(1.5.dp.toPx())) }
         }
-        TopBar(if (preview) "Предпросмотр" else "Обведи объект", if (preview) "Так будет на экране блокировки" else "Два пальца — приблизить", onBack)
+        TopBar(if (preview) s(R.string.mask_preview) else s(R.string.mask_trace), if (preview) s(R.string.mask_preview_hint) else s(R.string.mask_zoom_hint), onBack)
         BottomBar {
             if (!preview) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Pill("Добавить", primary = !erase, Modifier.weight(1f)) { erase = false }
-                    Pill("Стереть", primary = erase, Modifier.weight(1f)) { erase = true }
+                    Pill(s(R.string.mask_add), primary = !erase, Modifier.weight(1f)) { erase = false }
+                    Pill(s(R.string.mask_erase), primary = erase, Modifier.weight(1f)) { erase = true }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 6.dp)) {
-                    Text("Кисть", style = t(13, c = Dim), modifier = Modifier.padding(end = 12.dp))
+                    Text(s(R.string.mask_brush), style = t(13, c = Dim), modifier = Modifier.padding(end = 12.dp))
                     Box(Modifier.weight(1f)) { ThinSlider(brush, 0.015f..0.2f) { brush = it } }
                 }
             }
             if (preview && shot != null) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 8.dp)) {
-                    Text("Подрезать по часам", style = t(14), modifier = Modifier.weight(1f))
+                    Text(s(R.string.mask_cut_clock), style = t(14), modifier = Modifier.weight(1f))
                     Toggle(depth.enabled) { v -> updateDepth { enabled = v } }
                 }
                 if (depth.enabled) Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 8.dp)) {
-                    Text("Заходит на часы", style = t(13, c = Dim), modifier = Modifier.padding(end = 12.dp))
+                    Text(s(R.string.mask_overlap), style = t(13, c = Dim), modifier = Modifier.padding(end = 12.dp))
                     Box(Modifier.weight(1f)) { ThinSlider(depth.cover, 0f..0.8f) { v -> updateDepth { cover = v } } }
                     Text("${(depth.cover * 100).toInt()}%", style = t(13, c = Dim), modifier = Modifier.padding(start = 10.dp))
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (!preview) {
-                    Pill("Отменить", primary = false, Modifier.weight(1f)) {
+                    Pill(s(R.string.action_undo), primary = false, Modifier.weight(1f)) {
                         if (undo.isNotEmpty()) { canvas.drawBitmap(undo.removeLast(), 0f, 0f, Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC) }); gen++ }
                     }
-                    Pill("Авто", primary = false, Modifier.weight(1f)) { onAuto() }
+                    Pill(s(R.string.mask_auto), primary = false, Modifier.weight(1f)) { onAuto() }
                 }
-                Pill(if (preview) "Править" else "Посмотреть", primary = false, Modifier.weight(1f)) { preview = !preview; vs = 1f; vo = Offset.Zero }
-                if (preview) Pill("Поставить", primary = true, Modifier.weight(1f)) { onApply() }
+                Pill(if (preview) s(R.string.action_edit) else s(R.string.action_preview), primary = false, Modifier.weight(1f)) { preview = !preview; vs = 1f; vo = Offset.Zero }
+                if (preview) Pill(s(R.string.action_apply), primary = true, Modifier.weight(1f)) { onApply() }
             }
         }
     }
@@ -534,10 +534,10 @@ private fun Busy(text: String) {
 private fun Done(onClose: () -> Unit) {
     Box(Modifier.fillMaxSize().background(Ui.bg), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(32.dp)) {
-            Text("Готово", style = t(26))
-            Text("Обои с эффектом глубины стоят на экране блокировки. Заблокируй телефон, чтобы посмотреть.",
+            Text(s(R.string.done), style = t(26))
+            Text(s(R.string.mask_done_text),
                 style = t(14, c = Dim).copy(textAlign = androidx.compose.ui.text.style.TextAlign.Center), modifier = Modifier.padding(top = 10.dp, bottom = 28.dp))
-            Pill("Закрыть", primary = true, Modifier.fillMaxWidth()) { onClose() }
+            Pill(s(R.string.action_close), primary = true, Modifier.fillMaxWidth()) { onClose() }
         }
     }
 }
@@ -625,8 +625,8 @@ private fun apply(ctx: android.content.Context, wall: Bitmap, mask: Bitmap): Str
     java.io.File(ctx.filesDir, "depth_cutout.png").outputStream().use { cut.compress(Bitmap.CompressFormat.PNG, 100, it) }
     cut.recycle()
     val id = WallpaperManager.getInstance(ctx).setBitmap(wall, null, true, WallpaperManager.FLAG_LOCK)
-    if (id == 0) "Система не приняла обои" else systemUi(ctx, id.toString())
+    if (id == 0) s(R.string.mask_wallpaper_rejected) else systemUi(ctx, id.toString())
 } catch (t: Throwable) {
-    android.util.Log.e("derealization", "своя маска", t)
-    "Не получилось: ${(t.cause ?: t).javaClass.simpleName}"
+    android.util.Log.e("derealization", "custom mask", t)
+    s(R.string.mask_failed, (t.cause ?: t).javaClass.simpleName)
 }

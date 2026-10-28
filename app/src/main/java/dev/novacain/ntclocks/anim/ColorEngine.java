@@ -40,7 +40,7 @@ public final class ColorEngine {
     public static void hook(ClassLoader cl) {
         Class<?> c = XposedHelpers.findClassIfExists("com.android.systemui.theme.ThemeOverlayController", cl);
         if (c == null) {
-            XposedBridge.log("ntweaker: ThemeOverlayController не найден — цвета не трогаем");
+            XposedBridge.log("derealization: ThemeOverlayController not found — colors untouched");
             return;
         }
         Hook.all(c, "createOverlays", new XC_MethodHook() {
@@ -50,7 +50,7 @@ public final class ColorEngine {
                 schedule();
             }
         });
-        XposedBridge.log("ntweaker: движок цветов подключён");
+        XposedBridge.log("derealization: color engine hooked");
     }
 
     private static synchronized Handler bg() {
@@ -306,10 +306,10 @@ public final class ColorEngine {
             if (!hash.equals(Settings.Global.getString(app.getContentResolver(), WIDGETS_STAMP))) {
                 Settings.Global.putString(app.getContentResolver(), WIDGETS_STAMP, hash);
             }
-            XposedBridge.log("ntweaker: цвета " + (overlays.isEmpty() ? "сняты" : "применены " + count)
-                    + " за " + (android.os.SystemClock.elapsedRealtime() - t0) + " мс");
+            XposedBridge.log("derealization: colors " + (overlays.isEmpty() ? "removed" : "applied " + count)
+                    + " in " + (android.os.SystemClock.elapsedRealtime() - t0) + " ms");
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: цвета — " + t);
+            XposedBridge.log("derealization: colors — " + t);
         }
     }
 
@@ -335,7 +335,7 @@ public final class ColorEngine {
                 }
                 commit.invoke(om, txb.getMethod("build").invoke(b));
             } catch (java.lang.reflect.InvocationTargetException e) {
-                if (fo != null) XposedBridge.log("ntweaker: наложение цветов " + pkg + " — " + e.getCause());
+                if (fo != null) XposedBridge.log("derealization: color overlay " + pkg + " — " + e.getCause());
             }
         }
     }

@@ -41,9 +41,9 @@ public final class Injector {
                 clocks.put(m.getClockId(), ctor.newInstance(m, provider, null));
             }
             PrefsClient.get(context);   // заранее подтянуть настройки
-            Log.i(TAG, "часы модуля добавлены в ClockRegistry: " + clocks.keySet());
+            Log.i(TAG, "module clocks added to ClockRegistry: " + clocks.keySet());
         } catch (Throwable t) {
-            Log.e(TAG, "не удалось добавить часы — SystemUI работает как обычно", t);
+            Log.e(TAG, "couldn't add clocks — SystemUI works as usual", t);
         }
     }
 
@@ -62,7 +62,7 @@ public final class Injector {
             if (prefs == null || !prefs.prefs(id).hideSystemDate || widgetExpanded()) return;
             ((android.view.View) field(controller, "mView")).setVisibility(android.view.View.GONE);
         } catch (Throwable t) {
-            Log.w(TAG, "дата Nothing: " + t);
+            Log.w(TAG, "Nothing date: " + t);
         }
     }
 
@@ -75,7 +75,7 @@ public final class Injector {
             m.setAccessible(true);
             m.invoke(c);
         } catch (Throwable t) {
-            Log.w(TAG, "обновление даты Nothing: " + t);
+            Log.w(TAG, "Nothing date update: " + t);
         }
     }
 

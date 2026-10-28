@@ -37,15 +37,14 @@ internal fun UnlockTab() {
         Save.later("unlock", 200) { runCatching { Settings.Global.putString(cr, UnlockAnim.KEY, json) } }
     }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
-        Group("Как в iOS") {
-            SwitchRow("Часы уезжают при разблокировке", enabled) { v -> enabled = v; version++ }
+        Group(s(R.string.unlock_title)) {
+            SwitchRow(s(R.string.unlock_enabled), enabled) { v -> enabled = v; version++ }
             Text(
-                "Свайп вверх — часы с датой и виджеты идут за пальцем вверх, уменьшаются и растворяются (объект с обоев " +
-                    "остаётся на месте). Отпечаток — то же самое одним движением.",
+                s(R.string.unlock_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp)
             )
             if (enabled) {
-                SliderRow("Насколько уезжают", distance, 0.08f..0.45f, { "${(it * 100).toInt()}% экрана" }) { v -> distance = v; version++ }
+                SliderRow(s(R.string.unlock_distance), distance, 0.08f..0.45f, { s(R.string.unlock_distance_value, (it * 100).toInt()) }) { v -> distance = v; version++ }
             }
         }
         Spacer(Modifier.height(40.dp))

@@ -52,7 +52,7 @@ public final class LockWidgets {
     public static void hook(ClassLoader cl) {
         Class<?> c = XposedHelpers.findClassIfExists("com.nothing.systemui.widget.NTWidgetContainer", cl);
         if (c == null) {
-            XposedBridge.log("ntweaker: виджеты экрана блокировки — контейнер не найден");
+            XposedBridge.log("derealization: lock screen widgets — container not found");
             return;
         }
         Hook.all(c, "onFinishInflate", new XC_MethodHook() {
@@ -61,7 +61,7 @@ public final class LockWidgets {
                 try {
                     attach((LinearLayout) p.thisObject);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: виджеты экрана блокировки — " + t);
+                    XposedBridge.log("derealization: lock screen widgets — " + t);
                 }
             }
         });
@@ -76,7 +76,7 @@ public final class LockWidgets {
                 if (!dozing && bg != null) bg.post(() -> loadCmf(row.getContext().getContentResolver()));
             }
         });
-        XposedBridge.log("ntweaker: виджеты экрана блокировки подключены");
+        XposedBridge.log("derealization: lock screen widgets hooked");
     }
 
     private static void attach(LinearLayout container) {
@@ -139,10 +139,10 @@ public final class LockWidgets {
             if (c != null && c.moveToFirst()) o = new JSONObject(c.getString(0));
         } catch (Throwable t) {
             // cmf link не установлен (или старый, без провайдера) — виджетов наушников и шагов просто нет
-            if (!cmfLogged) XposedBridge.log("ntweaker: виджеты — cmf link недоступен: " + t);
+            if (!cmfLogged) XposedBridge.log("derealization: widgets — cmf link unavailable: " + t);
             cmfLogged = true;
         }
-        if (o != null && !cmfLogged) { XposedBridge.log("ntweaker: виджеты — cmf link: " + o); cmfLogged = true; }
+        if (o != null && !cmfLogged) { XposedBridge.log("derealization: widgets — cmf link: " + o); cmfLogged = true; }
         cmf = o;
         MAIN.post(LockWidgets::refresh);
     }
@@ -221,7 +221,7 @@ public final class LockWidgets {
 
             @Override
             public void onPlaybackStateChanged(PlaybackState state) {
-                if (debugLog) XposedBridge.log("ntweaker: виджет музыки — состояние " + state);
+                if (debugLog) XposedBridge.log("derealization: music widget — state " + state);
                 boolean was = playing;
                 state(state);
                 if (was != playing) refresh();
@@ -240,7 +240,7 @@ public final class LockWidgets {
                 msm.addOnActiveSessionsChangedListener(Media::pick, null, MAIN);
                 pick(sessions());
             } catch (Throwable t) {
-                XposedBridge.log("ntweaker: виджет музыки — " + t);
+                XposedBridge.log("derealization: music widget — " + t);
             }
         }
 

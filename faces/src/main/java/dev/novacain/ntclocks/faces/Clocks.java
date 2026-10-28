@@ -70,9 +70,9 @@ public final class Clocks {
 
     public static String title(String id) {
         switch (id) {
-            case DOTS: return "Точки";
-            case STRETCH: return "Растяг";
-            case ANALOG: return "Стрелки";
+            case DOTS: return L.t("Dots", "Точки");
+            case STRETCH: return L.t("Stretch", "Растяг");
+            case ANALOG: return L.t("Analog", "Стрелки");
             case IOS: return "iOS";
             case COLOROS: return "ColorOS";
             case ORIGIN: return "Origin";

@@ -51,23 +51,23 @@ class SettingsActivity : ComponentActivity() {
     }
 }
 
-private val TITLES = mapOf("anim" to "Анимации", "glass" to "Стекло", "color" to "Цвета", "clocks" to "Часы",
-    "depth" to "Глубина", "widgets" to "Виджеты", "unlock" to "Разблокировка", "home_dock" to "Стол и док", "home" to "derealization", "lock" to "derealization")
+private val TITLES get() = mapOf("anim" to s(R.string.section_anim), "glass" to s(R.string.section_glass), "color" to s(R.string.section_color), "clocks" to s(R.string.section_clocks),
+    "depth" to s(R.string.section_depth), "widgets" to s(R.string.section_widgets), "unlock" to s(R.string.section_unlock), "home_dock" to s(R.string.section_home_dock), "home" to "derealization", "lock" to "derealization")
 
 /** Разделы хаба: ключ, название, пояснение. */
-private val HUB = mapOf(
+private val HUB get() = mapOf(
     "home" to listOf(
-        Triple("anim", "Анимации", "Открытие приложений, стол, меню, шторка"),
-        Triple("home_dock", "Стол и док", "Док-стекло, подписи, жесты, растягивание значков"),
-        Triple("glass", "Стекло", "Прозрачность и размытие шторки и меню, виджеты"),
-        Triple("color", "Цвета", "Перекраска системы"),
+        Triple("anim", s(R.string.section_anim), s(R.string.section_anim_hint)),
+        Triple("home_dock", s(R.string.section_home_dock), s(R.string.section_home_dock_hint)),
+        Triple("glass", s(R.string.section_glass), s(R.string.section_glass_hint)),
+        Triple("color", s(R.string.section_color), s(R.string.section_color_hint)),
     ),
     "lock" to listOf(
-        Triple("clocks", "Часы", "Свои часы экрана блокировки и их вид"),
-        Triple("depth", "Глубина", "Объект с обоев поверх часов, своя маска"),
-        Triple("widgets", "Виджеты", "Наушники CMF, шаги с часов, музыка"),
-        Triple("unlock", "Разблокировка", "Часы уезжают и растворяются, как в iOS"),
-        Triple("glass", "Стекло", "Размытие и прозрачность"),
+        Triple("clocks", s(R.string.section_clocks), s(R.string.section_clocks_hint)),
+        Triple("depth", s(R.string.section_depth), s(R.string.section_depth_hint)),
+        Triple("widgets", s(R.string.section_widgets), s(R.string.section_widgets_hint)),
+        Triple("unlock", s(R.string.section_unlock), s(R.string.section_unlock_hint)),
+        Triple("glass", s(R.string.section_glass), s(R.string.section_glass_lock_hint)),
     ),
 )
 

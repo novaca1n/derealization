@@ -42,8 +42,8 @@ private fun blurModuleOn(): Boolean =
 
 private fun setBlurModule(on: Boolean): Boolean = if (on) su(
     "mkdir -p $BLUR_MODULE && rm -f $BLUR_MODULE/remove $BLUR_MODULE/disable && " +
-        "printf 'id=ntweaker_blur\\nname=ntweaker: размытие окон\\nversion=1\\nversionCode=1\\nauthor=NovaCain\\n" +
-        "description=Включает размытие окон (ro.surface_flinger.supports_background_blur)\\n' > $BLUR_MODULE/module.prop && " +
+        "printf 'id=ntweaker_blur\\nname=derealization: window blur\\nversion=1\\nversionCode=1\\nauthor=novaca1n\\n" +
+        "description=Turns window blur on (ro.surface_flinger.supports_background_blur)\\n' > $BLUR_MODULE/module.prop && " +
         "printf 'ro.surface_flinger.supports_background_blur=1\\n' > $BLUR_MODULE/system.prop"
 ).first else su("touch $BLUR_MODULE/remove").first
 
@@ -72,74 +72,64 @@ internal fun GlassTab() {
 
     var sub by androidx.compose.runtime.saveable.rememberSaveable { mutableIntStateOf(0) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
-        SubTabs(listOf("Шторка", "Рабочий стол", "Система"), sub) { sub = it }
-        if (sub < 2) Group("Стекло") {
-            SwitchRow("Включить", g.enabled) { v -> update { enabled = v } }
+        SubTabs(listOf(s(R.string.glass_tab_shade), s(R.string.glass_tab_home), s(R.string.glass_tab_system)), sub) { sub = it }
+        if (sub < 2) Group(s(R.string.glass_title)) {
+            SwitchRow(s(R.string.enable), g.enabled) { v -> update { enabled = v } }
             Text(
-                if (g.enabled) "Шторка — сразу; меню приложений — сразу или после перезапуска лаунчера."
-                else "Выключено — шторка и меню приложений как у Nothing.",
+                if (g.enabled) s(R.string.glass_on_hint)
+                else s(R.string.glass_off_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp)
             )
         }
         when (sub) {
         0 -> {
-        Group("Шторка и быстрые настройки") {
-            SliderRow("Непрозрачность фона", g.shadeAlpha, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { shadeAlpha = v } }
-            SliderRow("Размытие", g.shadeBlur, 0f..120f, { "${it.roundToInt()} dp" }) { v -> update { shadeBlur = v } }
-            SliderRow("Зерно", g.shadeGrain, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { shadeGrain = v } }
+        Group(s(R.string.glass_shade_qs)) {
+            SliderRow(s(R.string.glass_bg_opacity), g.shadeAlpha, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { shadeAlpha = v } }
+            SliderRow(s(R.string.glass_blur), g.shadeBlur, 0f..120f, { "${it.roundToInt()} dp" }) { v -> update { shadeBlur = v } }
+            SliderRow(s(R.string.glass_grain), g.shadeGrain, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { shadeGrain = v } }
         }
-        Group("Уведомления") {
-            SwitchRow("Скруглённые карточки, как в One UI", g.notifRound) { v -> update { notifRound = v } }
+        Group(s(R.string.glass_notifications)) {
+            SwitchRow(s(R.string.glass_notif_round), g.notifRound) { v -> update { notifRound = v } }
             if (g.notifRound) {
-                SliderRow("Скругление", g.notifRadius, 8f..40f, { "${it.roundToInt()} dp" }) { v -> update { notifRadius = v } }
-                SliderRow("Зазор между карточками", g.notifGap, 0f..24f, { "${it.roundToInt()} dp" }) { v -> update { notifGap = v } }
+                SliderRow(s(R.string.glass_notif_radius), g.notifRadius, 8f..40f, { "${it.roundToInt()} dp" }) { v -> update { notifRadius = v } }
+                SliderRow(s(R.string.glass_notif_gap), g.notifGap, 0f..24f, { "${it.roundToInt()} dp" }) { v -> update { notifGap = v } }
             }
-            Text("Применяется после перезагрузки.", style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp))
+            Text(s(R.string.applies_after_reboot), style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp))
         }
-        Group("Панели") {
-            SliderRow("Громкость и меню иконок", g.panelAlpha, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { panelAlpha = v } }
-            Text("Непрозрачность стеклянной подложки панели громкости и меню долгого нажатия на иконку.", style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp))
+        Group(s(R.string.glass_panels)) {
+            SliderRow(s(R.string.glass_panel_alpha), g.panelAlpha, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { panelAlpha = v } }
+            Text(s(R.string.glass_panel_alpha_hint), style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp))
         }
         QsSlidersCard()
         }
         1 -> {
-        Group("Меню приложений") {
-            SliderRow("Непрозрачность фона", g.drawerAlpha, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { drawerAlpha = v } }
-            SliderRow("Размытие обоев", g.drawerBlur, 0f..120f, { "${it.roundToInt()} dp" }) { v -> update { drawerBlur = v } }
-            SliderRow("Зерно", g.drawerGrain, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { drawerGrain = v } }
-            SliderRow("Карточки и поиск", g.searchAlpha, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { searchAlpha = v } }
+        Group(s(R.string.glass_drawer)) {
+            SliderRow(s(R.string.glass_bg_opacity), g.drawerAlpha, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { drawerAlpha = v } }
+            SliderRow(s(R.string.glass_wallpaper_blur), g.drawerBlur, 0f..120f, { "${it.roundToInt()} dp" }) { v -> update { drawerBlur = v } }
+            SliderRow(s(R.string.glass_grain), g.drawerGrain, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { drawerGrain = v } }
+            SliderRow(s(R.string.glass_search_alpha), g.searchAlpha, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { searchAlpha = v } }
         }
         LucentCard()
         NavCard()
         }
         else -> {
-        Group("Все твики") {
+        Group(s(R.string.glass_system_blur)) {
             Text(
-                "Большая кнопка на главной выключает анимации, стекло, прозрачные виджеты, эффект глубины, полоску жестов и " +
-                    "перекраску, запомнив настройки. «Вернуть твики» ставит всё как было. Шторка, громкость и уведомления " +
-                    "меняются полностью после перезагрузки, рабочий стол — после перезапуска лаунчера.",
-                style = t(12, c = Dim), modifier = Modifier.padding(top = 4.dp, bottom = 6.dp)
-            )
-        }
-        Group("Размытие в системе") {
-            Text(
-                if (blurNow) "Размытие окон работает." else "Сейчас телефон окна не размывает — работает только прозрачность.",
+                if (blurNow) s(R.string.glass_blur_works) else s(R.string.glass_blur_off),
                 style = t(15), modifier = Modifier.padding(top = 8.dp)
             )
             Text(
-                "Nothing выключила размытие окон на этой модели. Переключатель ставит маленький модуль Magisk, который " +
-                    "включает его обратно (ro.surface_flinger.supports_background_blur=1). Действует после перезагрузки; " +
-                    "выключение — тоже после перезагрузки. Размытие немного нагружает видеочип.",
+                s(R.string.glass_blur_module_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 6.dp, bottom = 4.dp)
             )
             module?.let { on ->
-                SwitchRow("Модуль размытия", on) { v ->
+                SwitchRow(s(R.string.glass_blur_module), on) { v ->
                     scope.launch {
                         if (withContext(Dispatchers.IO) { setBlurModule(v) }) { module = v; moduleChanged = true }
                     }
                 }
             }
-            if (moduleChanged) Text("Перезагрузи телефон, чтобы применить.", style = t(12, c = Accent), modifier = Modifier.padding(top = 2.dp))
+            if (moduleChanged) Text(s(R.string.reboot_to_apply), style = t(12, c = Accent), modifier = Modifier.padding(top = 2.dp))
         }
         }
         }
@@ -155,7 +145,7 @@ private fun homeItems(ctx: android.content.Context): List<HomeItem> = runCatchin
     (0 until a.length()).map { i ->
         val o = a.getJSONObject(i)
         val folder = o.optString("type") == "folder"
-        val title = o.optString("title").trim().ifEmpty { if (folder) "без названия" else "виджет" }
+        val title = o.optString("title").trim().ifEmpty { if (folder) s(R.string.lucent_untitled) else s(R.string.lucent_widget) }
         HomeItem(o.getInt("id"), folder, title, o.optInt("page", 1))
     }
 }.getOrDefault(emptyList())
@@ -177,23 +167,23 @@ private fun LucentCard() {
         val saved = l
         Save.later("lucent", 150) { runCatching { dev.novacain.ntclocks.anim.LucentPrefs.write(cr, saved) } }
     }
-    Group("Прозрачные папки и виджеты") {
-        Text("Как Lucent в Nothing OS 5: под подложкой размытые обои с зерном", style = t(12, c = Dim), modifier = Modifier.padding(top = 4.dp))
-        SwitchRow("Включить", l.enabled) { v -> update { enabled = v } }
+    Group(s(R.string.lucent_title)) {
+        Text(s(R.string.lucent_hint), style = t(12, c = Dim), modifier = Modifier.padding(top = 4.dp))
+        SwitchRow(s(R.string.enable), l.enabled) { v -> update { enabled = v } }
         if (l.enabled) {
-            SliderRow("Непрозрачность подложки", l.opacity, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { opacity = v } }
-            SwitchRow("Размытие обоев", l.blur) { v -> update { blur = v } }
+            SliderRow(s(R.string.lucent_opacity), l.opacity, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { opacity = v } }
+            SwitchRow(s(R.string.glass_wallpaper_blur), l.blur) { v -> update { blur = v } }
             if (l.blur) {
-                SliderRow("Сила размытия", l.blurRadius, 4f..80f, { "${it.roundToInt()} dp" }) { v -> update { blurRadius = v } }
-                SliderRow("Зерно", l.grain, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { grain = v } }
+                SliderRow(s(R.string.lucent_blur_radius), l.blurRadius, 4f..80f, { "${it.roundToInt()} dp" }) { v -> update { blurRadius = v } }
+                SliderRow(s(R.string.glass_grain), l.grain, 0f..1f, { "${(it * 100).roundToInt()}%" }) { v -> update { grain = v } }
             }
-            SwitchRow("Все папки и виджеты", l.all) { v -> update { all = v } }
+            SwitchRow(s(R.string.lucent_all), l.all) { v -> update { all = v } }
             if (!l.all) {
                 if (items.isEmpty()) {
-                    Text("Выйди на рабочий стол и вернись — лаунчер пришлёт список папок и виджетов.", style = t(12, c = Dim), modifier = Modifier.padding(top = 6.dp))
+                    Text(s(R.string.lucent_list_hint), style = t(12, c = Dim), modifier = Modifier.padding(top = 6.dp))
                 }
                 items.forEach { it ->
-                    SwitchRow("${if (it.folder) "Папка" else "Виджет"} · ${it.title} · экран ${it.page}", it.id in l.ids) { v ->
+                    SwitchRow(s(if (it.folder) R.string.lucent_folder_row else R.string.lucent_widget_row, it.title, it.page), it.id in l.ids) { v ->
                         update { if (v) ids.add(it.id) else ids.remove(it.id) }
                     }
                 }
@@ -206,11 +196,10 @@ private fun LucentCard() {
 /** Вертикальные ползунки — это плитки «Яркость» и «Громкость» в сетке быстрых настроек. */
 @Composable
 private fun QsSlidersCard() {
-    Group("Быстрые настройки") {
-        Text("Вертикальные ползунки яркости и громкости", style = t(15), modifier = Modifier.padding(top = 10.dp))
+    Group(s(R.string.glass_qs)) {
+        Text(s(R.string.glass_sliders), style = t(15), modifier = Modifier.padding(top = 10.dp))
         Text(
-            "Опусти шторку → карандаш → добавь плитки «Яркость» и «Громкость» (ntweaker). Они встанут ползунками 1×2, " +
-                "их можно двигать как обычные плитки. Пока стоит «Яркость», обычный ползунок яркости спрятан.",
+            s(R.string.glass_sliders_hint),
             style = t(12, c = Dim), modifier = Modifier.padding(top = 4.dp)
         )
     }

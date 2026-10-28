@@ -21,14 +21,14 @@ final class Hook {
     static Set<XC_MethodHook.Unhook> all(Class<?> c, String method, XC_MethodHook h) {
         if (TRACE) h = traced(c.getSimpleName() + "." + method, h);
         Set<XC_MethodHook.Unhook> s = XposedBridge.hookAllMethods(c, method, h);
-        if (s.isEmpty()) XposedBridge.log("ntweaker: хук не встал — " + c.getName() + "." + method + " (нет в классе)");
+        if (s.isEmpty()) XposedBridge.log("derealization: hook failed — " + c.getName() + "." + method + " (not in class)");
         return s;
     }
 
     static Set<XC_MethodHook.Unhook> ctors(Class<?> c, XC_MethodHook h) {
         if (TRACE) h = traced(c.getSimpleName() + ".<init>", h);
         Set<XC_MethodHook.Unhook> s = XposedBridge.hookAllConstructors(c, h);
-        if (s.isEmpty()) XposedBridge.log("ntweaker: хук не встал — " + c.getName() + ".<init>");
+        if (s.isEmpty()) XposedBridge.log("derealization: hook failed — " + c.getName() + ".<init>");
         return s;
     }
 

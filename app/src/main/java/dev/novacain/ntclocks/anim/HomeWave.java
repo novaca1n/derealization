@@ -55,7 +55,7 @@ public final class HomeWave {
                         }
                     }, new IntentFilter(ACTION_UNLOCK), "android.permission.STATUS_BAR", null, Context.RECEIVER_EXPORTED);
                 } catch (Throwable t) {
-                    XposedBridge.log("ntweaker: живой стол — " + t);
+                    XposedBridge.log("derealization: living home — " + t);
                 }
             }
         });
@@ -66,7 +66,7 @@ public final class HomeWave {
                 recents((ViewGroup) p.thisObject);
             }
         });
-        XposedBridge.log("ntweaker: живой стол подключён");
+        XposedBridge.log("derealization: living home hooked");
     }
 
     private static boolean on() {
@@ -86,7 +86,7 @@ public final class HomeWave {
             Object hs = XposedHelpers.callMethod(a, "getHotseat");
             if (hs != null) add((ViewGroup) XposedHelpers.callMethod(hs, "getShortcutsAndWidgets"));
         } catch (Throwable t) {
-            XposedBridge.log("ntweaker: живой стол, значки — " + t);
+            XposedBridge.log("derealization: living home, icons — " + t);
         }
         int n = VIEWS.size();
         cx = new float[n]; cy = new float[n]; delay = new float[n]; amp = new float[n]; ux = new float[n]; uy = new float[n];

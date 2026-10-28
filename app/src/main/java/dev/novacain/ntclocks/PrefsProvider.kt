@@ -14,7 +14,10 @@ import dev.novacain.ntclocks.faces.Clocks
  * Только чтение: менять настройки может лишь само приложение.
  */
 class PrefsProvider : ContentProvider() {
-    override fun onCreate() = true
+    override fun onCreate(): Boolean {
+        context?.let { Res.ctx = it.applicationContext }
+        return true
+    }
 
     override fun query(uri: Uri, projection: Array<out String>?, selection: String?, args: Array<out String>?, sort: String?): Cursor {
         val id = uri.lastPathSegment ?: ""

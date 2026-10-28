@@ -45,7 +45,7 @@ public final class OriginHooks {
                             try {
                                 homeBlur(a);
                             } catch (Throwable t) {
-                                XposedBridge.log("ntweaker: размытие стола — " + t);
+                                XposedBridge.log("derealization: home blur — " + t);
                                 root.getViewTreeObserver().removeOnPreDrawListener(this);
                             }
                             return true;
@@ -101,7 +101,7 @@ public final class OriginHooks {
                 }
             });
         }
-        XposedBridge.log("ntweaker: движение OriginOS 17 (лаунчер) подключено");
+        XposedBridge.log("derealization: OriginOS 17 motion (launcher) hooked");
     }
 
     private static final int PRESS_TAG = 0x7e4e5402;
@@ -321,12 +321,12 @@ public final class OriginHooks {
                     try {
                         shade((Float) p.args[0]);
                     } catch (Throwable t) {
-                        XposedBridge.log("ntweaker: шторка OriginOS — " + t);
+                        XposedBridge.log("derealization: OriginOS shade — " + t);
                     }
                 }
             });
         }
-        XposedBridge.log("ntweaker: шторка OriginOS 17 " + (pv != null && sm != null ? "подключена" : "не найдена"));
+        XposedBridge.log("derealization: OriginOS 17 shade " + (pv != null && sm != null ? "hooked" : "not found"));
     }
 
     private static void shade(float fraction) {

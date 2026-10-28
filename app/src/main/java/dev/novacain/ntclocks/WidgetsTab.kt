@@ -41,15 +41,15 @@ internal fun WidgetsTab() {
         Save.later("widgets", 200) { runCatching { WidgetPrefs.write(cr, saved) } }
     }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
-        Group("Виджеты экрана блокировки") {
-            SwitchRow("Показывать", w.enabled) { v -> update { enabled = v } }
+        Group(s(R.string.widgets_title)) {
+            SwitchRow(s(R.string.widgets_show), w.enabled) { v -> update { enabled = v } }
             Text(
-                "Ряд карточек Material 3 под часами, в цветах системы. Карточка без данных не показывается, в Always-on ряд скрыт.",
+                s(R.string.widgets_hint),
                 style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp)
             )
         }
         if (w.enabled) {
-            Group("Пример") {
+            Group(s(R.string.widgets_example)) {
                 // те же карточки, что рисует SystemUI, на примерных данных
                 val brush = androidx.compose.ui.graphics.Brush.verticalGradient(listOf(androidx.compose.ui.graphics.Color(0xFF3A4A5C), androidx.compose.ui.graphics.Color(0xFF1B2229)))
                 androidx.compose.foundation.layout.Box(
@@ -67,17 +67,17 @@ internal fun WidgetsTab() {
                     )
                 }
             }
-            Group("Карточки") {
-                SwitchRow("Наушники CMF — заряд", w.buds) { v -> update { buds = v } }
-                SwitchRow("Шаги с часов", w.steps) { v -> update { steps = v } }
+            Group(s(R.string.widgets_cards)) {
+                SwitchRow(s(R.string.widgets_buds), w.buds) { v -> update { buds = v } }
+                SwitchRow(s(R.string.widgets_steps), w.steps) { v -> update { steps = v } }
                 if (w.steps) {
-                    SliderRow("Цель шагов", w.goal.toFloat(), 2000f..20000f, { "${(it / 500).toInt() * 500}" }) { v -> update { goal = (v / 500).toInt() * 500 } }
+                    SliderRow(s(R.string.widgets_goal), w.goal.toFloat(), 2000f..20000f, { "${(it / 500).toInt() * 500}" }) { v -> update { goal = (v / 500).toInt() * 500 } }
                 }
-                SwitchRow("Музыка", w.music) { v -> update { music = v } }
+                SwitchRow(s(R.string.widgets_music), w.music) { v -> update { music = v } }
                 Text(
                     when {
-                        cmf == null -> "Наушники и шаги берутся из cmf link — он не установлен."
-                        else -> "Наушники и шаги — из cmf link $cmf (нужна 1.2 или новее); музыка — из любого плеера."
+                        cmf == null -> s(R.string.widgets_no_cmf)
+                        else -> s(R.string.widgets_source, cmf)
                     },
                     style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp, bottom = 6.dp)
                 )
