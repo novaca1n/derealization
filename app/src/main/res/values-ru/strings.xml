@@ -52,7 +52,7 @@
     <string name="anim_whole_system">Вся система</string>
     <string name="anim_scale">Скорость анимаций</string>
     <string name="anim_scale_hint">То же, что «Масштаб анимации» в параметрах разработчика. Меньше — быстрее.</string>
-    <string name="anim_grant_hint">Чтобы приложение могло менять анимации, один раз выдай доступ:\nadb shell pm grant dev.novacain.ntclocks android.permission.WRITE_SECURE_SETTINGS</string>
+    <string name="anim_grant_hint">Чтобы приложение могло менять анимации, один раз нажми «Патч» на главном экране — он выдаст доступ.\nИли вручную: adb shell pm grant dev.novacain.ntclocks android.permission.WRITE_SECURE_SETTINGS</string>
     <string name="anim_demo_main">Главная</string>
     <string name="anim_demo_detail">Подробно</string>
     <string name="preset_nothing">родные, ровные</string>
@@ -70,7 +70,7 @@
     <string name="clock_font_label">Шрифт</string>
     <string name="clock_applied">Стоит на экране блокировки</string>
     <string name="clock_apply">Поставить на экран блокировки</string>
-    <string name="clock_grant_hint">Чтобы приложение могло менять часы, один раз выдай доступ:\nadb shell pm grant dev.novacain.ntclocks android.permission.WRITE_SECURE_SETTINGS</string>
+    <string name="clock_grant_hint">Чтобы приложение могло менять часы, один раз нажми «Патч» на главном экране — он выдаст доступ.\nИли вручную: adb shell pm grant dev.novacain.ntclocks android.permission.WRITE_SECURE_SETTINGS</string>
     <string name="clock_restore">Вернуть часы Nothing</string>
     <string name="clock_general">Общие</string>
     <string name="clock_size">Размер</string>

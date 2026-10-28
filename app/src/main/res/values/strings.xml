@@ -61,7 +61,7 @@
     <string name="anim_whole_system">Whole system</string>
     <string name="anim_scale">Animation speed</string>
     <string name="anim_scale_hint">Same as Animation scale in developer options. Lower is faster.</string>
-    <string name="anim_grant_hint">To let the app change animations, grant access once:\nadb shell pm grant dev.novacain.ntclocks android.permission.WRITE_SECURE_SETTINGS</string>
+    <string name="anim_grant_hint">To let the app change animations, tap Patch on the main screen once — it grants the access.\nOr by hand: adb shell pm grant dev.novacain.ntclocks android.permission.WRITE_SECURE_SETTINGS</string>
     <string name="anim_demo_main">Home</string>
     <string name="anim_demo_detail">Details</string>
     <string name="preset_nothing">stock, even</string>
@@ -79,7 +79,7 @@
     <string name="clock_font_label">Font</string>
     <string name="clock_applied">On the lock screen</string>
     <string name="clock_apply">Set on the lock screen</string>
-    <string name="clock_grant_hint">To let the app change the clock, grant access once:\nadb shell pm grant dev.novacain.ntclocks android.permission.WRITE_SECURE_SETTINGS</string>
+    <string name="clock_grant_hint">To let the app change the clock, tap Patch on the main screen once — it grants the access.\nOr by hand: adb shell pm grant dev.novacain.ntclocks android.permission.WRITE_SECURE_SETTINGS</string>
     <string name="clock_restore">Bring back Nothing\'s clock</string>
     <string name="clock_general">General</string>
     <string name="clock_size">Size</string>

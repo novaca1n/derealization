@@ -118,6 +118,9 @@ internal object Patcher {
         val (rc2, out2) = su("$CLI scope set $PKG $scope")
         if (rc2 != 0) { step(s(R.string.patch_scope_failed, out2).take(120)); return false }
         step(s(R.string.patch_scope_ok))
+        // часы и анимации приложение пишет в Settings.Secure/Global — право выдаём сами, без adb (после переустановки
+        // его нет); не фатально: без него не работает только выбор часов и анимаций
+        su("pm grant $PKG android.permission.WRITE_SECURE_SETTINGS")
         if (Tweaks.isOff(ctx)) { Tweaks.restoreAll(ctx); step(s(R.string.patch_settings_restored)) }
         installStore(ctx, step)
         clearGuards()

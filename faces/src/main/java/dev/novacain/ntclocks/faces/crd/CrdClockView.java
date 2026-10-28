@@ -54,6 +54,7 @@ public final class CrdClockView extends FrameLayout implements ClockFace {
     private final Map<TextView, Integer> originalColor = new HashMap<>();
     private final Map<TextView, Typeface> originalFont = new HashMap<>();
     private final List<TextView> clockFontViews = new ArrayList<>();
+    private final List<TextView> fitted = new ArrayList<>();
     private ClockPrefs prefs = new ClockPrefs();
     private float doze;
     private boolean regionDark = true;
@@ -110,6 +111,16 @@ public final class CrdClockView extends FrameLayout implements ClockFace {
             originalFont.put(tv, tv.getTypeface());
             if (tagHas(tv, "clockfont")) clockFontViews.add(tv);
             if (tv instanceof TextClock) clocks.add((TextClock) tv);
+            if (tv.getMaxLines() == 1) {
+                // время меняется раз в минуту без новой разметки ("1111" уже "2048") — проверять при каждой смене
+                tv.addTextChangedListener(new android.text.TextWatcher() {
+                    @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) { }
+                    @Override public void onTextChanged(CharSequence s, int a, int b, int c) { }
+                    @Override public void afterTextChanged(android.text.Editable s) { fit(tv); }
+                });
+                tv.addOnLayoutChangeListener((x, l, t, r, b, ol, ot, or, ob) -> fit(tv));
+                fitted.add(tv);
+            }
         }
         if (v instanceof LottieAnimationView) startLottie((LottieAnimationView) v);
         if (v instanceof ViewGroup) {
@@ -118,6 +129,20 @@ public final class CrdClockView extends FrameLayout implements ClockFace {
             g.setClipToPadding(false);
             for (int i = 0; i < g.getChildCount(); i++) collect(g.getChildAt(i));
         }
+    }
+
+    /**
+     * Строка не влезает в ширину — сжать буквы по горизонтали, а не обрезать «…». Нужно открытой сборке: замены
+     * шрифтов crDroid бывают в 1.4–2.5 раза шире своих оригиналов (Bebas вместо узкого tallclock — «17…» у стиля 29).
+     */
+    private void fit(TextView tv) {
+        // размер часов > 1 растягивает всю разметку после этого — строка должна влезть в экран уже увеличенной
+        float avail = (tv.getWidth() - tv.getTotalPaddingLeft() - tv.getTotalPaddingRight()) / Math.max(1f, scale());
+        CharSequence t = tv.getText();
+        if (avail <= 0 || t == null) return;
+        float need = t.length() == 0 ? 0f : tv.getPaint().measureText(t, 0, t.length()) / tv.getTextScaleX();
+        float k = need > avail ? avail * 0.98f / need : 1f;
+        if (Math.abs(tv.getTextScaleX() - k) > 0.005f) tv.setTextScaleX(k);
     }
 
     private static boolean tagHas(View v, String part) {
@@ -203,6 +228,7 @@ public final class CrdClockView extends FrameLayout implements ClockFace {
     @Override
     public void setSystemLayout(boolean centered, boolean normalSize) {
         normal = normalSize;
+        for (TextView tv : fitted) fit(tv);
         requestLayout();
     }
 
@@ -240,6 +266,7 @@ public final class CrdClockView extends FrameLayout implements ClockFace {
     private void apply() {
         Typeface chosen = prefs.font.isEmpty() ? Fonts.systemClock() : Fonts.get(getContext(), prefs.font);
         for (TextView tv : clockFontViews) tv.setTypeface(chosen);
+        for (TextView tv : fitted) fit(tv);                             // другой шрифт — другая ширина
         boolean aod = doze > 0.5f;
         int color = resolveColor();
         for (TextView tv : texts) {

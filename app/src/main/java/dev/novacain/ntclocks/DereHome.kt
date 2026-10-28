@@ -32,11 +32,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -99,9 +101,20 @@ internal fun DereHome() {
     val expand = remember { Animatable(0f) }                  // 0 — кнопка, 1 — лист
     var buttonRect by remember { mutableStateOf(Rect.Zero) }
 
+    // Состояние — по самому Vector при каждом возврате в приложение: при первом запуске root ещё может быть не выдан
+    // (тогда ответа нет — показываем «Патч», а не сохранённое «Пропатчено»), выдали в Magisk — вернулись — проверили.
+    var resumed by remember { mutableIntStateOf(0) }
+    LifecycleResumeEffect(Unit) { resumed++; onPauseOrDispose { } }
+    LaunchedEffect(resumed, job) {
+        if (job != null) return@LaunchedEffect
+        when (val on = Patcher.vectorEnabled()) {
+            null -> off = true
+            else -> if (on == off) { Patcher.remember(ctx, on); off = !on }
+        }
+    }
+
     LaunchedEffect(job) {
         if (job != null) return@LaunchedEffect
-        Patcher.vectorEnabled()?.let { on -> if (on == off) { Patcher.remember(ctx, on); off = !on } }
         safe = Patcher.safeMode()
         val f = Patcher.failures()
         notes = listOfNotNull(Patcher.compatibility(ctx), if (f.isNotEmpty()) s(R.string.home_failed_count, f.size, f.first()) else null)
