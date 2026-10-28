@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- выбрать часы = записать Settings.Secure lock_screen_custom_clock_face; выдаётся один раз через adb/root -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    <!-- своя маска глубины: обои экрана блокировки из выбранного фото -->
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- проверка совместимости: версии целей патча -->
+    <queries>
+        <package android:name="com.nothing.launcher" />
+        <package android:name="com.nothing.wallpaper" />
+        <package android:name="com.android.settings" />
+        <package android:name="com.android.systemui" />
+        <!-- tweak store installed while patching -->
+        <package android:name="dev.novacain.tweakstore" />
+        <!-- раздел «Виджеты»: есть ли cmf link и какой версии -->
+        <package android:name="dev.novacain.cmflink" />
+    </queries>
+
+    <application
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:theme="@android:style/Theme.Material.NoActionBar"
+        android:allowBackup="false">
+
+        <!-- LSPosed: это модуль, область действия — SystemUI -->
+        <meta-data android:name="xposedmodule" android:value="true" />
+        <meta-data android:name="xposeddescription" android:value="@string/xposed_description" />
+        <meta-data android:name="xposedminversion" android:value="82" />
+        <meta-data android:name="xposedscope" android:resource="@array/xposed_scope" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- настройки derealization: открываются только из «Обоев и стиля» Nothing (PickerHooks), иконки нет -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="true"
+            android:excludeFromRecents="false" />
+
+        <!-- своя маска эффекта глубины (из настроек derealization → Глубина) -->
+        <activity
+            android:name=".DepthMaskActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- настройки часов для SystemUI: только чтение, JSON по id часов -->
+        <!-- directBootAware: SystemUI рисует экран блокировки ещё до первой разблокировки после включения -->
+        <!-- плитки быстрых настроек: модуль рисует на их месте вертикальные ползунки 1×2 -->
+        <service
+            android:name=".qs.BrightnessTile"
+            android:exported="true"
+            android:icon="@drawable/ic_tile_brightness"
+            android:label="Яркость"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter><action android:name="android.service.quicksettings.action.QS_TILE" /></intent-filter>
+        </service>
+        <service
+            android:name=".qs.VolumeTile"
+            android:exported="true"
+            android:icon="@drawable/ic_tile_volume"
+            android:label="Громкость"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter><action android:name="android.service.quicksettings.action.QS_TILE" /></intent-filter>
+        </service>
+        <provider
+            android:name=".PrefsProvider"
+            android:authorities="dev.novacain.ntclocks.prefs"
+            android:directBootAware="true"
+            android:exported="true" />
+    </application>
+</manifest>

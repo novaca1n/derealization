@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/clock_frame" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginHorizontal="20dp" android:layout_gravity="center_horizontal|top" android:gravity="center_horizontal|top" android:orientation="vertical">
+
+    <TextClock android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="-10dp" android:format12Hour="hh" android:format24Hour="HH" android:gravity="center" android:singleLine="true" android:tag="text1|nolineheight|clockfont" android:textColor="@android:color/white" android:textSize="70sp" android:textStyle="bold" />
+
+    <TextClock android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="-10dp" android:format12Hour="mm" android:format24Hour="mm" android:gravity="center_horizontal" android:singleLine="true" android:tag="text1|clockfont" android:textColor="@android:color/white" android:textSize="70sp" android:textStyle="bold" />
+
+    <TextClock android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="-12dp" android:format12Hour="EEE" android:format24Hour="EEE" android:gravity="center_horizontal" android:maxLines="2" android:singleLine="true" android:textAlignment="center" android:textAllCaps="true" android:textColor="@android:color/system_accent1_200" android:textSize="40sp" android:tag="clockfont" />
+
+    <TextClock android:layout_width="wrap_content" android:layout_height="wrap_content" android:format12Hour="MMMM" android:format24Hour="MMMM" android:singleLine="true" android:tag="accent1|clockfont" android:textAlignment="center" android:textAllCaps="true" android:textColor="@android:color/white" android:textSize="12sp" />
+
+    <TextClock android:layout_width="wrap_content" android:layout_height="wrap_content" android:format12Hour="dd - yyy" android:format24Hour="dd - yyy" android:singleLine="true" android:tag="text1|clockfont" android:textAlignment="center" android:textAllCaps="true" android:textColor="@android:color/white" android:textSize="12sp" />
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:gravity="center_horizontal" android:orientation="horizontal">
+
+        <dev.novacain.ntclocks.faces.crd.WeatherImageView android:id="@+id/weather_image" android:layout_width="12sp" android:layout_height="12sp" android:layout_gravity="center_vertical" android:layout_marginEnd="4dp" android:scaleType="fitCenter" android:visibility="gone" />
+
+        <dev.novacain.ntclocks.faces.crd.WeatherTextView android:id="@+id/weather_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:layout_marginStart="4dp" android:textAlignment="center" android:textColor="@android:color/white" android:visibility="gone" android:textSize="12sp" android:tag="clockfont" />
+    </LinearLayout>
+</LinearLayout>

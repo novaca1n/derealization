@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/clock_frame" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center_horizontal|top" android:gravity="center_horizontal|top" android:orientation="vertical">
+
+    <TextClock android:id="@+id/clock" android:layout_width="match_parent" android:layout_height="wrap_content" android:alpha="0.9" android:layout_marginBottom="8dp" android:format12Hour="hh:mm" android:format24Hour="HH:mm" android:gravity="center" android:singleLine="true" android:tag="text1|clockfont" android:textAlignment="center" android:textColor="@android:color/white" android:textSize="100sp" android:textStyle="bold" />
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center">
+
+        <TextClock android:id="@+id/date" android:layout_width="wrap_content" android:layout_height="wrap_content" android:format12Hour="EEE, MMM d" android:format24Hour="EEE, d MMM" android:gravity="center" android:singleLine="true" android:tag="text1|nolineheight|clockfont" android:textAlignment="center" android:textColor="@android:color/white" android:textSize="20sp" />
+
+        <dev.novacain.ntclocks.faces.crd.WeatherImageView android:id="@+id/weather_image" android:layout_width="18sp" android:layout_height="18sp" android:layout_gravity="center_vertical" android:layout_marginStart="8dp" android:layout_marginEnd="4dp" android:visibility="gone" />
+
+        <dev.novacain.ntclocks.faces.crd.WeatherTextView android:id="@+id/weather_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:layout_marginStart="4dp" android:layout_marginEnd="8dp" android:textColor="@android:color/white" android:textSize="20sp" android:visibility="gone" android:tag="clockfont" />
+    </LinearLayout>
+
+</LinearLayout>

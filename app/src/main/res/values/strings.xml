@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">derealization</string>
+    <string name="xposed_description">derealization — патч SystemUI, лаунчера и «Обоев и стиля» Nothing OS: часы, анимации, стекло, цвета, растягивание значков, раздельная шторка</string>
+    <string-array name="xposed_scope">
+        <item>com.android.systemui</item>
+        <item>com.nothing.launcher</item>
+        <item>com.nothing.wallpaper</item>
+        <item>com.android.settings</item>
+    </string-array>
+    <string name="patch_store_installed">TweakStore installed</string>
+    <string name="patch_store_updated">TweakStore updated</string>
+    <string name="patch_store_ok">TweakStore is up to date</string>
+    <string name="patch_store_failed">Couldn\'t install TweakStore — patching goes on</string>
+    <string name="menu_store">TweakStore</string>
+</resources>

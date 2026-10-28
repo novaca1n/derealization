@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- stand-ins above: hidden from the font picker so it doesn't list the same font under other names -->
+    <string-array name="nc_font_aliases">
+        <item>crd_astthillabeltaden</item>
+        <item>crd_ayame</item>
+        <item>crd_bebas</item>
+        <item>crd_blackout</item>
+        <item>crd_cattyabrown</item>
+        <item>crd_cotta</item>
+        <item>crd_expanse</item>
+        <item>crd_fontarian</item>
+        <item>crd_fontsfree_net_carthart</item>
+        <item>crd_general_sans</item>
+        <item>crd_getaway</item>
+        <item>crd_gobold</item>
+        <item>crd_goldenage</item>
+        <item>crd_heathergreen</item>
+        <item>crd_hollow</item>
+        <item>crd_hollow2</item>
+        <item>crd_japanese3017</item>
+        <item>crd_kenyen</item>
+        <item>crd_lightpixel</item>
+        <item>crd_longest</item>
+        <item>crd_neumatic</item>
+        <item>crd_ntype82</item>
+        <item>crd_quartilla</item>
+        <item>crd_samsung7</item>
+        <item>crd_sans_bold</item>
+        <item>crd_slateforoneplus_bold</item>
+        <item>crd_slateforoneplus_medium</item>
+        <item>crd_slateforoneplus_regular</item>
+        <item>crd_slim</item>
+        <item>crd_subway</item>
+        <item>crd_tallclock</item>
+        <item>crd_varino</item>
+    </string-array>
+</resources>

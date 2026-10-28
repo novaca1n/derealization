@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="patch_store_installed">TweakStore установлен</string>
+    <string name="patch_store_updated">TweakStore обновлён</string>
+    <string name="patch_store_ok">TweakStore уже свежий</string>
+    <string name="patch_store_failed">Не удалось поставить TweakStore — патч продолжается</string>
+</resources>

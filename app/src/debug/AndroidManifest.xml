@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug builds only: test hooks driven from adb (DUMP is held only by shell and the system). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- set preferences from adb -->
+        <receiver
+            android:name=".DebugPrefs"
+            android:directBootAware="true"
+            android:exported="true"
+            android:permission="android.permission.DUMP" />
+        <receiver
+            android:name=".DebugMedia"
+            android:exported="true"
+            android:permission="android.permission.DUMP" />
+        <receiver
+            android:name=".DebugRender"
+            android:exported="true"
+            android:permission="android.permission.DUMP" />
+        <receiver
+            android:name=".DebugHeadsUp"
+            android:exported="true"
+            android:permission="android.permission.DUMP" />
+    </application>
+</manifest>

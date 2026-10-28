@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- open stand-in for a font that can't be redistributed (the original is used only in private builds) -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android">
+    <font android:font="@font/crd_encodesanslight" />
+</font-family>

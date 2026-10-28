@@ -1,0 +1,20 @@
+# build output
+build/
+.gradle/
+.kotlin/
+*.apk
+*.aab
+local.properties
+
+# tweakstore is bundled at build time (tools/bundle-tweakstore.sh)
+app/src/main/assets/tweakstore.apk
+
+# personal, never public: the author's notes, device backups and settings snapshots
+changelog.md
+backup-*/
+tools/restore-prefs/
+
+# perf tooling: keep the scripts, not traces or the Python venv
+tools/perf/*
+!tools/perf/*.sh
+!tools/perf/*.py
