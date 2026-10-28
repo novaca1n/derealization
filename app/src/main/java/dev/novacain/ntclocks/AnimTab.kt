@@ -441,13 +441,16 @@ private fun PresetGrid(selected: String, onPick: (String) -> Unit) {
             androidx.compose.foundation.layout.Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)) {
                 row.forEach { (id, title, hint) ->
                     val on = id == selected
+                    val cs = androidx.compose.material3.MaterialTheme.colorScheme
+                    // выбранный — залит акцентным контейнером и чуть круглее (выразительная смена формы)
+                    val r by androidx.compose.animation.core.animateDpAsState(if (on) 28.dp else 16.dp, label = "preset")
+                    val bg by androidx.compose.animation.animateColorAsState(if (on) cs.primaryContainer else cs.surfaceContainer, label = "presetBg")
                     Column(
-                        Modifier.weight(1f).clip(RoundedCornerShape(18.dp)).background(if (on) Surface2 else Surface)
-                            .then(if (on) Modifier.border(1.5.dp, Color.White, RoundedCornerShape(18.dp)) else Modifier)
-                            .clickable { onPick(id) }.padding(horizontal = 14.dp, vertical = 12.dp)
+                        Modifier.weight(1f).clip(RoundedCornerShape(r)).background(bg)
+                            .clickable { onPick(id) }.padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
-                        Text(title, style = t(15, FontWeight.Medium, if (on) Color.White else Color(0xFFD8D8D8)))
-                        Text(hint, style = t(12, c = Dim), modifier = Modifier.padding(top = 2.dp))
+                        Text(title, style = t(15, FontWeight.Medium, if (on) cs.onPrimaryContainer else cs.onSurface))
+                        Text(hint, style = t(12, c = if (on) cs.onPrimaryContainer.copy(alpha = 0.8f) else cs.onSurfaceVariant), modifier = Modifier.padding(top = 2.dp))
                     }
                 }
                 if (row.size == 1) Spacer(Modifier.weight(1f))

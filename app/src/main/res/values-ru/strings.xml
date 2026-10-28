@@ -67,7 +67,7 @@
     <string name="clock_as_aod">Как в Always-on</string>
     <string name="clock_tab_choose">Выбор</string>
     <string name="clock_tab_adjust">Настройка</string>
-    <string name="clock_font_label">ШРИФТ</string>
+    <string name="clock_font_label">Шрифт</string>
     <string name="clock_applied">Стоит на экране блокировки</string>
     <string name="clock_apply">Поставить на экран блокировки</string>
     <string name="clock_grant_hint">Чтобы приложение могло менять часы, один раз выдай доступ:\nadb shell pm grant dev.novacain.ntclocks android.permission.WRITE_SECURE_SETTINGS</string>
@@ -339,4 +339,5 @@
     <string name="xposed_description">derealization — патч SystemUI, лаунчера и «Обоев и стиля» Nothing OS: часы, анимации, стекло, цвета, растягивание значков, раздельная шторка</string>
     <string name="tile_brightness">Яркость</string>
     <string name="tile_volume">Громкость</string>
+    <string name="action_back">Назад</string>
 </resources>

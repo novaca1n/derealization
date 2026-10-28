@@ -178,11 +178,12 @@ private fun PaletteChip(label: String, res: Pair<Int, Int>, selected: Boolean, m
     Column(modifier.clickable(onClick = onClick), horizontalAlignment = Alignment.CenterHorizontally) {
         Row(
             Modifier.fillMaxWidth().height(36.dp).clip(RoundedCornerShape(12.dp))
-                .then(if (selected) Modifier.border(2.dp, Color.White, RoundedCornerShape(12.dp)) else Modifier)
+                .then(if (selected) Modifier.border(3.dp, androidx.compose.material3.MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)) else Modifier)
         ) {
             Box(Modifier.weight(1f).fillMaxSize().background(Color(ctx.getColor(res.first))))
             Box(Modifier.weight(1f).fillMaxSize().background(Color(ctx.getColor(res.second))))
         }
-        Text(label, style = t(12, if (selected) FontWeight.Medium else FontWeight.Normal, if (selected) Color.White else Dim), modifier = Modifier.padding(top = 4.dp))
+        Text(label, style = t(12, if (selected) FontWeight.Medium else FontWeight.Normal,
+            if (selected) androidx.compose.material3.MaterialTheme.colorScheme.primary else Dim), modifier = Modifier.padding(top = 4.dp))
     }
 }

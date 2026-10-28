@@ -52,7 +52,7 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2026.09.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.foundation:foundation")
-    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material3:material3:1.5.0-beta01")   // Material 3 Expressive, as in TweakStore
     implementation("androidx.activity:activity-compose:1.13.0")
     // вырезка объекта для своей маски глубины — тот же ML Kit, что у «Обоев и стиля» (модель из Google Play services)
     implementation("com.google.android.gms:play-services-mlkit-subject-segmentation:16.0.0-beta1")

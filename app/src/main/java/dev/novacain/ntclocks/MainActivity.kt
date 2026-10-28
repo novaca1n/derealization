@@ -1,5 +1,14 @@
 package dev.novacain.ntclocks
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.foundation.layout.PaddingValues
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -110,8 +119,8 @@ internal val Dot: FontFamily by lazy { systemFont("Ndot-57.otf") ?: Geist }
 internal val Mono: FontFamily by lazy { systemFont("LetteraMonoLL-Regular.otf") ?: Geist }
 
 /** Подпись в духе Nothing: моноширинный шрифт, строчные буквы в верхнем регистре, разрядка. */
-internal fun mono(size: Int = 11, c: Color = Dim, spacing: Float = 0.08f) =
-    TextStyle(fontFamily = Mono, fontSize = size.sp, color = c, letterSpacing = (spacing * size).sp)
+internal fun mono(size: Int = 12, c: Color = Dim, @Suppress("UNUSED_PARAMETER") spacing: Float = 0f) =
+    TextStyle(fontFamily = FontFamily.Default, fontWeight = FontWeight.Medium, fontSize = size.sp, color = c)
 
 private const val KEY_FACE = "lock_screen_custom_clock_face"
 private val PALETTE = listOf(0xFFF0471E, 0xFFFFFFFF, 0xFFFF3B30, 0xFFFFC233, 0xFF34C759, 0xFF2F8CFF, 0xFF8E5BFF, 0xFFFF4F9A)
@@ -119,9 +128,8 @@ private val PALETTE = listOf(0xFFF0471E, 0xFFFFFFFF, 0xFFFF3B30, 0xFFFFC233, 0xF
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Ui.dopamine()
         enableEdgeToEdge()
-        setContent { App() }
+        setContent { DereTheme(dark = true) { App() } }
     }
 
     override fun onPause() {
@@ -185,34 +193,26 @@ internal fun openWallpaperStyle(ctx: Context) {
     }
 }
 
-/** Подвкладки внутри вкладки: тонкая «таблетка» под заголовком. */
+/** Подвкладки: соединённая группа кнопок-переключателей Material 3 Expressive. */
 @Composable
 internal fun SubTabs(labels: List<String>, selected: Int, onSelect: (Int) -> Unit) {
-    Row(
-        Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 6.dp).clip(RoundedCornerShape(50)).background(Surface).border(1.dp, Line, RoundedCornerShape(50)).padding(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        labels.forEachIndexed { i, label ->
-            val on = i == selected
-            val bg by animateColorAsState(if (on) Ui.selected else Color.Transparent, label = "sub")
-            Box(
-                Modifier.weight(1f).clip(RoundedCornerShape(50)).background(bg).clickable { onSelect(i) }.padding(vertical = 10.dp),
-                contentAlignment = Alignment.Center
-            ) { Text(label, style = t(14, FontWeight.Medium, if (on) Ui.onSelected else Dim)) }
-        }
-    }
+    Box(Modifier.padding(top = 4.dp, bottom = 6.dp)) { Segmented(labels, selected, onSelect) }
 }
 
-/** Карточка-группа настроек. */
+/** Группа настроек: заголовок акцентом и карточка с крупными скруглениями. */
 @Composable
 internal fun Group(title: String, content: @Composable () -> Unit) = Appear { Column { GroupBody(title, content) } }
 
 @Composable
 private fun GroupBody(title: String, content: @Composable () -> Unit) {
-    Spacer(Modifier.height(22.dp))
-    Text(title, style = t(14, FontWeight.Medium, Dim), modifier = Modifier.padding(start = 8.dp, bottom = 8.dp))
-    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(if (Ui.picker) 28.dp else 26.dp)).background(Surface).border(1.dp, Line, RoundedCornerShape(if (Ui.picker) 28.dp else 26.dp)).padding(horizontal = 18.dp, vertical = 10.dp)) {
-        CompositionLocalProvider(LocalOnCard provides true) { content() }
+    Spacer(Modifier.height(20.dp))
+    Text(title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(start = 16.dp, bottom = 8.dp))
+    androidx.compose.material3.Surface(color = MaterialTheme.colorScheme.surfaceContainer, shape = RoundedCornerShape(24.dp),
+        modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
+            CompositionLocalProvider(LocalOnCard provides true) { content() }
+        }
     }
 }
 
@@ -259,13 +259,13 @@ internal fun ClocksTab() {
             Segmented(ids.map { Clocks.title(it) }, ids.indexOf(id)) { id = ids[it] }
         }
         Spacer(Modifier.height(14.dp))
-        Text("CRDROID · ${Clocks.IDS.size - Clocks.OWN.size}", style = mono())
+        Text("crDroid · ${Clocks.IDS.size - Clocks.OWN.size}", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
         Spacer(Modifier.height(8.dp))
         CrdStrip(id) { id = it }
 
         if (id != Clocks.DOTS && id != Clocks.ANALOG) {
             Spacer(Modifier.height(14.dp))
-            Text(s(R.string.clock_font_label), style = mono())
+            Text(s(R.string.clock_font_label), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(8.dp))
             FontStrip(prefs.font) { v -> update { font = v } }
         }
@@ -456,9 +456,10 @@ private fun CrdStrip(selected: String, onSelect: (String) -> Unit) {
     LazyRow(state = state, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         items(ids, key = { it }) { cid ->
             val on = cid == selected
+            val cs = MaterialTheme.colorScheme
             Column(
-                Modifier.width(132.dp).clip(RoundedCornerShape(16.dp)).background(Surface)
-                    .then(if (on) Modifier.border(1.5.dp, Color.White, RoundedCornerShape(16.dp)) else Modifier)
+                Modifier.width(132.dp).clip(RoundedCornerShape(16.dp)).background(if (on) cs.primaryContainer else cs.surfaceContainer)
+                    .then(if (on) Modifier.border(3.dp, cs.primary, RoundedCornerShape(16.dp)) else Modifier)
                     .clickable { onSelect(cid) }
             ) {
                 Box(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)).background(Color(0xFF15151A)),
@@ -468,7 +469,7 @@ private fun CrdStrip(selected: String, onSelect: (String) -> Unit) {
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                     )
                 }
-                Text(Clocks.title(cid), style = t(12, if (on) FontWeight.Medium else FontWeight.Normal, if (on) Color.White else Dim),
+                Text(Clocks.title(cid), style = t(12, if (on) FontWeight.Medium else FontWeight.Normal, if (on) cs.onPrimaryContainer else cs.onSurfaceVariant),
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp), maxLines = 1)
             }
         }
@@ -485,14 +486,15 @@ private fun FontStrip(selected: String, onSelect: (String) -> Unit) {
         items(keys, key = { it }) { k ->
             val on = k == selected
             val family = remember(k) { if (k.isEmpty()) FontFamily.Default else FontFamily(Fonts.get(ctx, k)) }
+            val cs = MaterialTheme.colorScheme
+            val r by androidx.compose.animation.core.animateDpAsState(if (on) 24.dp else 14.dp, label = "font")
             Column(
-                Modifier.clip(RoundedCornerShape(14.dp)).background(if (on) Surface2 else Surface)
-                    .then(if (on) Modifier.border(1.5.dp, Color.White, RoundedCornerShape(14.dp)) else Modifier)
+                Modifier.clip(RoundedCornerShape(r)).background(if (on) cs.primaryContainer else cs.surfaceContainer)
                     .clickable { onSelect(k) }.padding(horizontal = 14.dp, vertical = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("12:34", style = TextStyle(fontFamily = family, fontSize = 24.sp, color = Color.White), maxLines = 1)
-                Text(Fonts.title(k), style = t(11, c = Dim), maxLines = 1)
+                Text("12:34", style = TextStyle(fontFamily = family, fontSize = 24.sp, color = if (on) cs.onPrimaryContainer else cs.onSurface), maxLines = 1)
+                Text(Fonts.title(k), style = t(11, c = if (on) cs.onPrimaryContainer else cs.onSurfaceVariant), maxLines = 1)
             }
         }
     }
@@ -501,116 +503,110 @@ private fun FontStrip(selected: String, onSelect: (String) -> Unit) {
 @Composable
 internal fun Section(title: String) {
     Spacer(Modifier.height(24.dp))
-    Text(title.uppercase(), style = mono())
+    Text(title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
     Spacer(Modifier.height(4.dp))
 }
 
 @Composable
 internal fun Label(text: String) {
-    Text(text, style = t(15), modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
+    Text(text, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
 }
 
 @Composable
 internal fun SliderRow(label: String, value: Float, range: ClosedFloatingPointRange<Float>, fmt: (Float) -> String, onChange: (Float) -> Unit) {
     Column(Modifier.padding(top = 8.dp)) {
-        Row {
-            Text(label, style = t(15), modifier = Modifier.weight(1f))
-            Text(fmt(value), style = mono(12, spacing = 0f))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+            Text(fmt(value), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         ThinSlider(value, range, onChange)
     }
 }
 
-/** Ползунок в духе Nothing: тонкая линия, пройденная часть белая, ручка — белая точка. Тап или тяни в любом месте. */
+/** Ползунок Material 3 Expressive. */
 @Composable
 internal fun ThinSlider(value: Float, range: ClosedFloatingPointRange<Float>, onChange: (Float) -> Unit) {
-    val change by rememberUpdatedState(onChange)
-    val span = range.endInclusive - range.start
-    val frac = ((value - range.start) / span).coerceIn(0f, 1f)
-    var dragging by remember { mutableStateOf(false) }
-    val knob by androidx.compose.animation.core.animateDpAsState(if (dragging) 18.dp else 14.dp, label = "knob")
-    androidx.compose.foundation.Canvas(
-        Modifier.fillMaxWidth().height(36.dp)
-            .pointerInput(range) {
-                fun at(x: Float) = range.start + span * (x / size.width).coerceIn(0f, 1f)
-                detectTapGestures(onPress = { change(at(it.x)) })
-            }
-            .pointerInput(range) {
-                fun at(x: Float) = range.start + span * (x / size.width).coerceIn(0f, 1f)
-                detectHorizontalDragGestures(
-                    onDragStart = { dragging = true; change(at(it.x)) },
-                    onDragEnd = { dragging = false }, onDragCancel = { dragging = false }
-                ) { c, _ -> c.consume(); change(at(c.position.x)) }
-            }
-    ) {
-        val r = knob.toPx() / 2
-        val y = size.height / 2
-        val x = r + (size.width - 2 * r) * frac
-        val stroke = 2.dp.toPx()
-        drawLine(Line, androidx.compose.ui.geometry.Offset(r, y), androidx.compose.ui.geometry.Offset(size.width - r, y), stroke, androidx.compose.ui.graphics.StrokeCap.Round)
-        val on = if (Ui.picker) Ui.accent else Color.White
-        if (Ui.picker) drawLine(Ui.surface2, androidx.compose.ui.geometry.Offset(r, y), androidx.compose.ui.geometry.Offset(size.width - r, y), stroke * 2, androidx.compose.ui.graphics.StrokeCap.Round)
-        drawLine(on, androidx.compose.ui.geometry.Offset(r, y), androidx.compose.ui.geometry.Offset(x, y), if (Ui.picker) stroke * 2 else stroke, androidx.compose.ui.graphics.StrokeCap.Round)
-        drawCircle(on, r, androidx.compose.ui.geometry.Offset(x, y))
-    }
+    androidx.compose.material3.Slider(value = value.coerceIn(range), onValueChange = onChange, valueRange = range)
 }
 
 @Composable
 internal fun SwitchRow(label: String, value: Boolean, onChange: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, style = t(15), modifier = Modifier.weight(1f))
+    Row(Modifier.fillMaxWidth().clickable { onChange(!value) }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f).padding(end = 12.dp))
         Toggle(value, onChange)
     }
 }
 
+/** Переключатель Material 3: включённый — с галочкой на ручке. */
 @Composable
 internal fun Toggle(value: Boolean, onChange: (Boolean) -> Unit) {
     Switch(
         checked = value, onCheckedChange = onChange,
-        colors = SwitchDefaults.colors(
-            checkedThumbColor = if (Ui.picker) Ui.onSelected else Color.White, checkedTrackColor = Accent,
-            uncheckedThumbColor = Ui.thumbOff, uncheckedTrackColor = Ui.trackOff, uncheckedBorderColor = if (Ui.picker) Ui.thumbOff else Line
-        )
+        thumbContent = if (value) { { Icon(CheckIcon, null, Modifier.size(SwitchDefaults.IconSize)) } } else null,
     )
 }
 
+internal val CheckIcon by lazy {
+    androidx.compose.ui.graphics.vector.ImageVector.Builder("check", 24.dp, 24.dp, 24f, 24f)
+        .addPath(androidx.compose.ui.graphics.vector.PathParser().parsePathString("M9,16.17L4.83,12l-1.42,1.41L9,19 21,7l-1.41,-1.41z").toNodes(),
+            fill = androidx.compose.ui.graphics.SolidColor(Color.Black))
+        .build()
+}
+
+/** Выбор одного из вариантов: соединённая группа кнопок-переключателей (Material 3 Expressive). */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
-    Row(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(50)).background(if (LocalOnCard.current) Bg else Surface).padding(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        options.forEachIndexed { i, s ->
-            val idle = if (LocalOnCard.current) Bg else Surface
-            val bg by animateColorAsState(if (i == selected) Ui.selected else Color.Transparent, label = "seg")
-            Box(
-                Modifier.weight(1f).clip(RoundedCornerShape(50)).background(bg).clickable { onSelect(i) }.padding(vertical = 10.dp),
-                contentAlignment = Alignment.Center
-            ) { Text(s, style = t(13, if (i == selected) FontWeight.Medium else FontWeight.Normal, if (i == selected) Ui.onSelected else Dim)) }
+    val cs = MaterialTheme.colorScheme
+    val colors = ToggleButtonDefaults.colors(
+        containerColor = if (LocalOnCard.current) cs.surfaceContainerHighest else cs.surfaceContainer,
+        contentColor = cs.onSurfaceVariant,
+        checkedContainerColor = cs.primary, checkedContentColor = cs.onPrimary,
+    )
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)) {
+        options.forEachIndexed { i, label ->
+            ToggleButton(
+                checked = i == selected, onCheckedChange = { onSelect(i) },
+                modifier = Modifier.weight(1f),
+                shapes = when (i) {
+                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                    options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                },
+                colors = colors,
+                contentPadding = PaddingValues(horizontal = 6.dp),
+            ) {
+                Text(label, style = MaterialTheme.typography.labelLarge, maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            }
         }
     }
 }
 
 @Composable
 private fun Palette(selected: Int, onSelect: (Int) -> Unit) {
+    val ring = MaterialTheme.colorScheme.primary
     Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         PALETTE.forEach { c ->
             val argb = Color(c).toArgb()
+            val on = argb == selected
             Box(
-                Modifier.size(32.dp).clip(CircleShape).background(Color(c))
-                    .then(if (argb == selected) Modifier.border(2.dp, Color.White, CircleShape) else Modifier)
-                    .clickable { onSelect(argb) }
+                Modifier.size(36.dp).clip(CircleShape)
+                    .then(if (on) Modifier.border(3.dp, ring, CircleShape).padding(5.dp).clip(CircleShape) else Modifier.padding(2.dp).clip(CircleShape))
+                    .background(Color(c)).clickable { onSelect(argb) }
             )
         }
     }
 }
 
+/** Кнопка Material 3 Expressive: главная — заливкой, остальные — тональные; форма пружинит при нажатии. */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun Button(text: String, primary: Boolean, onClick: () -> Unit) {
-    Box(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(50)).background(if (primary) Ui.selected else Surface)
-            .then(if (primary) Modifier else Modifier.border(1.dp, Line, RoundedCornerShape(50)))
-            .clickable(onClick = onClick).padding(vertical = 15.dp),
-        contentAlignment = Alignment.Center
-    ) { Text(text, style = t(15, FontWeight.Medium, if (primary) Ui.onSelected else Ui.text)) }
+    val m = Modifier.fillMaxWidth().heightIn(min = 52.dp)
+    if (primary) androidx.compose.material3.Button(onClick = onClick, shapes = ButtonDefaults.shapes(), modifier = m) {
+        Text(text, style = MaterialTheme.typography.labelLarge)
+    } else FilledTonalButton(onClick = onClick, shapes = ButtonDefaults.shapes(), modifier = m) {
+        Text(text, style = MaterialTheme.typography.labelLarge)
+    }
 }

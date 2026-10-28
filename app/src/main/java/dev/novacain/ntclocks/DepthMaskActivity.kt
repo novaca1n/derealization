@@ -91,7 +91,6 @@ import kotlin.math.max
 class DepthMaskActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Ui.picker(this)
         enableEdgeToEdge()
         window.attributes = window.attributes.apply {
             layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
@@ -102,7 +101,7 @@ class DepthMaskActivity : ComponentActivity() {
         }
         val b = windowManager.currentWindowMetrics.bounds
         // фото можно передать сразу (data) — тогда без выбора
-        setContent { MaskEditor(b.width(), b.height(), intent.data) { finish() } }
+        setContent { DereTheme { MaskEditor(b.width(), b.height(), intent.data) { finish() } } }
     }
 }
 

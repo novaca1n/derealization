@@ -1,5 +1,6 @@
 package dev.novacain.ntclocks
 
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.ui.graphics.drawscope.scale
 import android.content.Context
 import androidx.compose.animation.core.Animatable
@@ -75,8 +76,9 @@ import kotlin.math.sin
  * «О телефоне»), меню и лист — полупрозрачная тёмная карточка, как actionMenuColor у Dopamine.
  */
 
-private val MenuColor = Color(0x73282828)          // как actionMenuColor Dopamine (723f3f3f), темнее — на ярком фоне
-private val Sep = Color(0x4D999999)                // разделитель: white 0.6 alpha 0.3
+// как actionMenuColor Dopamine — полупрозрачная карточка поверх живого фона, но цвета — роли Material 3 системы
+private val MenuColor get() = Ui.surface.copy(alpha = 0.72f)
+private val Sep get() = Ui.dim.copy(alpha = 0.22f)
 
 private enum class Job { PATCH, UNPATCH }
 
@@ -175,16 +177,16 @@ internal fun DereHome() {
             Spacer(Modifier.weight(0.55f))
             // заголовок: приподнимается на 25 dp, когда идёт патч
             Column(Modifier.graphicsLayer { translationY = -25.dp.toPx() * menuShift }) {
-                Text("derealization", style = t(40, FontWeight.SemiBold, Color.White))
-                Text(system, style = t(14, FontWeight.Medium, Color.White), modifier = Modifier.padding(top = 2.dp))
-                Text("v$versionName · by novaca1n", style = t(14, c = Color.White.copy(alpha = 0.6f)))
+                Text("derealization", style = t(40, FontWeight.SemiBold, Ui.text))
+                Text(system, style = t(14, FontWeight.Medium, Ui.text), modifier = Modifier.padding(top = 2.dp))
+                Text("v$versionName · by novaca1n", style = t(14, c = Ui.dim))
                 val statusLine = when {
                     safe.isNotEmpty() -> s(R.string.home_safe_mode, safe.joinToString())
                     !off && !(sys && launcher) -> s(R.string.home_patched_waiting)
                     else -> null
                 }
                 (listOfNotNull(statusLine) + if (!off) notes else emptyList()).forEach {
-                    Text(it, style = t(13, c = Color(0xFFFFD27A)), modifier = Modifier.padding(top = 6.dp))
+                    Text(it, style = t(13, c = Ui.warn), modifier = Modifier.padding(top = 6.dp))
                 }
             }
             Spacer(Modifier.weight(0.25f))
@@ -194,7 +196,7 @@ internal fun DereHome() {
                     alpha = 1f - menuShift
                     translationY = -75.dp.toPx() * menuShift
                     val s = 1f - 0.4f * menuShift; scaleX = s; scaleY = s
-                }.clip(RoundedCornerShape(16.dp)).background(MenuColor).padding(horizontal = 20.dp, vertical = 5.dp)
+                }.clip(RoundedCornerShape(28.dp)).background(MenuColor).padding(horizontal = 20.dp, vertical = 5.dp)
             ) {
                 val rows = buildList {
                     add(Triple(Glyph.GEAR, s(R.string.menu_settings), true) to { openWallpaperStyle(ctx) })
@@ -215,19 +217,24 @@ internal fun DereHome() {
                 }
             }
             Spacer(Modifier.height(30.dp))
-            // кнопка — та же карточка; при патче разворачивается в лист (рисуется ниже поверх всего)
+            // кнопка: есть что делать — залитая акцентом «таблетка» Material 3, иначе — стекло, как карточка; при патче
+            // разворачивается в лист (рисуется ниже поверх всего), её цвет перетекает в цвет листа
+            val pressSrc = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+            val pressed by pressSrc.collectIsPressedAsState()
+            val btnCorner by androidx.compose.animation.core.animateDpAsState(if (pressed) 18.dp else 30.dp, label = "btn")
             Box(
                 Modifier.fillMaxWidth().height(60.dp).onGloballyPositioned { buttonRect = it.boundsInRoot() }
                     .graphicsLayer { alpha = if (job != null) 0f else 1f }
-                    .clip(RoundedCornerShape(16.dp)).background(MenuColor)
-                    .clickable(enabled = job == null && repatch) { run(Job.PATCH) },
+                    .clip(RoundedCornerShape(btnCorner)).background(if (repatch) Ui.accent else MenuColor)
+                    .clickable(interactionSource = pressSrc, indication = androidx.compose.material3.ripple(), enabled = job == null && repatch) { run(Job.PATCH) },
                 contentAlignment = Alignment.Center
             ) {
+                val fg = if (repatch) Ui.onAccent else Ui.dim
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    GlyphIcon(Glyph.LOCK, Modifier.size(18.dp), open = true)
+                    GlyphIcon(Glyph.LOCK, Modifier.size(18.dp), open = true, color = fg)
                     Spacer(Modifier.width(10.dp))
                     Text(if (safe.isNotEmpty()) s(R.string.home_repatch) else if (off) s(R.string.home_patch) else s(R.string.home_patched),
-                        style = t(17, FontWeight.Medium, Color.White.copy(alpha = if (repatch) 1f else 0.7f)))
+                        style = t(17, FontWeight.Medium, fg))
                 }
             }
             Spacer(Modifier.weight(0.4f))
@@ -239,11 +246,11 @@ internal fun DereHome() {
             val left = lerp(buttonRect.left, 0f, e)
             val right = lerp(buttonRect.right, wPx, e)
             val bottom = lerp(buttonRect.bottom, hPx + with(density) { 100.dp.toPx() }, e)
-            val corner = 16.dp + 12.dp * e
+            val corner = 30.dp + 2.dp * e
             Box(
                 Modifier.offset { IntOffset(left.toInt(), top.toInt()) }
                     .size(with(density) { (right - left).toDp() }, with(density) { (bottom - top).toDp() })
-                    .clip(RoundedCornerShape(corner)).background(MenuColor)
+                    .clip(RoundedCornerShape(corner)).background(androidx.compose.ui.graphics.lerp(Ui.accent, MenuColor, e))
             ) {
                 // заголовок листа с двойной спиралью
                 Row(
@@ -253,7 +260,7 @@ internal fun DereHome() {
                     Helix(Modifier.width(30.dp).height(12.dp), done)
                     Spacer(Modifier.width(10.dp))
                     Text(when { done -> if (job == Job.PATCH) s(R.string.home_patched) else s(R.string.home_unpatched); job == Job.PATCH -> s(R.string.home_patching); else -> s(R.string.home_unpatching) },
-                        style = t(18, c = Color.White))
+                        style = t(18, c = Ui.text))
                 }
             }
             // журнал «как текст песни» — внизу экрана
@@ -329,11 +336,11 @@ private fun MenuRow(g: Glyph, title: String, chevron: Boolean, separator: Boolea
         Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
             GlyphIcon(g, Modifier.size(18.dp))
             Spacer(Modifier.width(12.dp))
-            Text(title, style = t(16, FontWeight.Medium, Color.White), modifier = Modifier.weight(1f))
+            Text(title, style = t(16, FontWeight.Medium, Ui.text), modifier = Modifier.weight(1f))
             if (chevron) Canvas(Modifier.size(14.dp)) {
                 val s = size.width; val st = 1.6.dp.toPx()
-                drawLine(Color.White.copy(alpha = 0.6f), Offset(s * 0.35f, s * 0.15f), Offset(s * 0.7f, s * 0.5f), st, StrokeCap.Round)
-                drawLine(Color.White.copy(alpha = 0.6f), Offset(s * 0.7f, s * 0.5f), Offset(s * 0.35f, s * 0.85f), st, StrokeCap.Round)
+                drawLine(Ui.dim, Offset(s * 0.35f, s * 0.15f), Offset(s * 0.7f, s * 0.5f), st, StrokeCap.Round)
+                drawLine(Ui.dim, Offset(s * 0.7f, s * 0.5f), Offset(s * 0.35f, s * 0.85f), st, StrokeCap.Round)
             }
         }
         if (separator) Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(1.dp).background(Sep))
@@ -341,7 +348,7 @@ private fun MenuRow(g: Glyph, title: String, chevron: Boolean, separator: Boolea
 }
 
 @Composable
-private fun GlyphIcon(g: Glyph, modifier: Modifier, open: Boolean = false, color: Color = Color.White) {
+private fun GlyphIcon(g: Glyph, modifier: Modifier, open: Boolean = false, color: Color = Ui.text) {
     Canvas(modifier) { drawGlyph(g, color, open) }
 }
 
@@ -416,7 +423,7 @@ private fun Helix(modifier: Modifier, stop: Boolean) {
             val k = (1 - cos(ph * 2 * Math.PI)) / 2                       // 0 → 1 → 0, ease in-out
             val dy = (if (row == 0) -1 else 1) * amp * k.toFloat()
             val y = size.height / 2 + (if (row == 0) amp else -amp) + dy
-            drawCircle(Color.White.copy(alpha = if (row == 0) 0.8f else 1f), dot / 2, Offset(i * gap + dot / 2, y))
+            drawCircle(Ui.accent.copy(alpha = if (row == 0) 0.7f else 1f), dot / 2, Offset(i * gap + dot / 2, y))
         }
     }
 }
@@ -460,13 +467,13 @@ private fun LyricLine(text: String, current: Boolean, success: Boolean, key: Int
                 success -> GlyphIcon(Glyph.LOCK, Modifier.size(19.dp), open = true)
                 else -> Canvas(Modifier.size(17.dp)) {
                     val s = this.size.width
-                    drawLine(Color.White, Offset(s * 0.12f, s * 0.55f), Offset(s * 0.4f, s * 0.82f), s * 0.11f, StrokeCap.Round)
-                    drawLine(Color.White, Offset(s * 0.4f, s * 0.82f), Offset(s * 0.9f, s * 0.2f), s * 0.11f, StrokeCap.Round)
+                    drawLine(Ui.accent, Offset(s * 0.12f, s * 0.55f), Offset(s * 0.4f, s * 0.82f), s * 0.11f, StrokeCap.Round)
+                    drawLine(Ui.accent, Offset(s * 0.4f, s * 0.82f), Offset(s * 0.9f, s * 0.2f), s * 0.11f, StrokeCap.Round)
                 }
             }
         }
         Spacer(Modifier.width(15.dp))
-        Text(text, style = androidx.compose.ui.text.TextStyle(fontFamily = Ui.font ?: Geist, fontSize = androidx.compose.ui.unit.TextUnit(size, androidx.compose.ui.unit.TextUnitType.Sp), color = Color.White), maxLines = 1)
+        Text(text, style = androidx.compose.ui.text.TextStyle(fontFamily = Ui.font, fontSize = androidx.compose.ui.unit.TextUnit(size, androidx.compose.ui.unit.TextUnitType.Sp), color = Ui.text), maxLines = 1)
     }
 }
 
@@ -476,8 +483,8 @@ private fun Spinner(modifier: Modifier) {
     var a by remember { mutableStateOf(0f) }
     LaunchedEffect(Unit) { var s = 0L; while (true) withFrameNanos { n -> if (s == 0L) s = n; a = ((n - s) / 1e9f * 360f) % 360f } }
     Canvas(modifier) {
-        drawArc(Color.White.copy(alpha = 0.25f), 0f, 360f, false, style = Stroke(size.width * 0.12f))
-        drawArc(Color.White, a, 90f, false, style = Stroke(size.width * 0.12f, cap = StrokeCap.Round))
+        drawArc(Ui.accent.copy(alpha = 0.25f), 0f, 360f, false, style = Stroke(size.width * 0.12f))
+        drawArc(Ui.accent, a, 90f, false, style = Stroke(size.width * 0.12f, cap = StrokeCap.Round))
     }
 }
 
@@ -488,10 +495,10 @@ private fun Credits(version: String, onBack: () -> Unit) {
     androidx.activity.compose.BackHandler(onBack = onBack)
     Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.55f)).clickable(onClick = onBack)) {
         Column(
-            Modifier.align(Alignment.Center).padding(horizontal = 30.dp).fillMaxWidth().clip(RoundedCornerShape(16.dp))
-                .background(MenuColor).clickable(enabled = false) {}.padding(20.dp)
+            Modifier.align(Alignment.Center).padding(horizontal = 30.dp).fillMaxWidth().clip(RoundedCornerShape(28.dp))
+                .background(Ui.raised).clickable(enabled = false) {}.padding(24.dp)
         ) {
-            Text(s(R.string.credits_title, version), style = t(18, FontWeight.SemiBold, Color.White))
+            Text(s(R.string.credits_title, version), style = t(18, FontWeight.SemiBold, Ui.text))
             Spacer(Modifier.height(12.dp))
             listOf(
                 "novaca1n" to s(R.string.credits_author),
@@ -499,12 +506,12 @@ private fun Credits(version: String, onBack: () -> Unit) {
                 "Dopamine — opa334, tomt000" to s(R.string.credits_dopamine),
                 "crDroid Android" to s(R.string.credits_crdroid),
                 "Box2D-lite — Erin Catto" to s(R.string.credits_box2d),
-                "Geist — Vercel · Ndot — Nothing" to s(R.string.credits_fonts),
+                "Inter · Outfit · Ndot — Nothing" to s(R.string.credits_fonts),
             ).forEachIndexed { i, (a, b) ->
                 if (i > 0) Box(Modifier.fillMaxWidth().height(1.dp).background(Sep))
                 Column(Modifier.padding(vertical = 10.dp)) {
-                    Text(a, style = t(15, FontWeight.Medium, Color.White))
-                    Text(b, style = t(13, c = Color.White.copy(alpha = 0.6f)))
+                    Text(a, style = t(15, FontWeight.Medium, Ui.text))
+                    Text(b, style = t(13, c = Ui.dim))
                 }
             }
         }

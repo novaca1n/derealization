@@ -39,10 +39,17 @@ import androidx.compose.ui.unit.dp
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Ui.picker(this)
         enableEdgeToEdge()
-        val section = intent.getStringExtra("section") ?: "anim"
-        setContent { SettingsPage(section) { finish() } }
+        section.value = intent.getStringExtra("section") ?: "anim"
+        setContent { DereTheme { androidx.compose.runtime.key(section.value) { SettingsPage(section.value) { finish() } } } }
+    }
+
+    /** Уже открыт сверху, а просят другой раздел — показать его (из «Обоев и стиля» экран и так открывается заново). */
+    private val section = androidx.compose.runtime.mutableStateOf("anim")
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        intent.getStringExtra("section")?.let { section.value = it }
     }
 
     override fun onPause() {
@@ -77,34 +84,33 @@ private fun SettingsPage(start: String, onBack: () -> Unit) {
     val inHub = HUB.containsKey(section)
     val back = { if (!inHub && HUB.containsKey(start)) section = start else onBack() }
     androidx.activity.compose.BackHandler(onBack = back)
-    val bg = colorResource(android.R.color.system_neutral1_900)
-    val card = Ui.surface
-    Column(Modifier.fillMaxSize().background(bg).statusBarsPadding().navigationBarsPadding()) {
-        // шапка как у «Обоев и стиля»: стрелка назад слева, заголовок по центру
-        Box(Modifier.fillMaxWidth().height(64.dp)) {
-            Box(Modifier.align(Alignment.CenterStart).padding(start = 8.dp).size(48.dp).clip(CircleShape).clickable(onClick = back),
-                contentAlignment = Alignment.Center) {
-                Canvas(Modifier.size(24.dp)) {
-                    val w = size.width; val s = w * 0.09f
-                    drawLine(Ui.text, Offset(w * 0.15f, w / 2), Offset(w * 0.85f, w / 2), s, StrokeCap.Round)
-                    drawLine(Ui.text, Offset(w * 0.15f, w / 2), Offset(w * 0.45f, w * 0.2f), s, StrokeCap.Round)
-                    drawLine(Ui.text, Offset(w * 0.15f, w / 2), Offset(w * 0.45f, w * 0.8f), s, StrokeCap.Round)
-                }
-            }
-            Text(TITLES[section] ?: "derealization", style = t(22, FontWeight.Normal), modifier = Modifier.align(Alignment.Center))
+    val cs = androidx.compose.material3.MaterialTheme.colorScheme
+    val type = androidx.compose.material3.MaterialTheme.typography
+    // Surface задаёт цвет содержимого (onSurface) — иначе значки рисуются чёрным
+    androidx.compose.material3.Surface(color = cs.surface, modifier = Modifier.fillMaxSize()) {
+    Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
+        // шапка как у TweakStore: «назад» сверху, крупный заголовок слева
+        androidx.compose.material3.IconButton(onClick = back, modifier = Modifier.padding(start = 8.dp, top = 8.dp)) {
+            androidx.compose.material3.Icon(BackIcon, s(R.string.action_back))
         }
+        Text(TITLES[section] ?: "derealization", style = type.displaySmall, color = cs.onSurface,
+            modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 4.dp, bottom = 16.dp))
         Box(Modifier.fillMaxSize().padding(top = 4.dp)) {
             AppearScope(section) {
                 when {
                     inHub -> Column(Modifier.padding(horizontal = 16.dp)) {
-                        HUB[section]!!.forEach { (key, title, sub) ->
+                        val items = HUB[section]!!
+                        items.forEachIndexed { i, (key, title, sub) ->
                             Appear {
-                                androidx.compose.foundation.layout.Row(Modifier.fillMaxWidth().padding(vertical = 6.dp)
-                                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(28.dp)).background(card)
-                                    .clickable { section = key }.padding(horizontal = 20.dp, vertical = 18.dp)) {
-                                    Column(Modifier.weight(1f)) {
-                                        Text(title, style = t(18, FontWeight.Medium))
-                                        Text(sub, style = t(13, c = Dim), modifier = Modifier.padding(top = 2.dp))
+                                androidx.compose.material3.Surface(color = cs.surfaceContainer, shape = groupShape(i, items.size),
+                                    onClick = { section = key }, modifier = Modifier.fillMaxWidth().padding(vertical = 1.dp)) {
+                                    androidx.compose.foundation.layout.Row(Modifier.padding(start = 20.dp, end = 16.dp, top = 18.dp, bottom = 18.dp),
+                                        verticalAlignment = Alignment.CenterVertically) {
+                                        Column(Modifier.weight(1f)) {
+                                            Text(title, style = type.titleMedium, color = cs.onSurface)
+                                            Text(sub, style = type.bodyMedium, color = cs.onSurfaceVariant, modifier = Modifier.padding(top = 2.dp))
+                                        }
+                                        androidx.compose.material3.Icon(ChevronIcon, null, tint = cs.onSurfaceVariant)
                                     }
                                 }
                             }
@@ -123,3 +129,22 @@ private fun SettingsPage(start: String, onBack: () -> Unit) {
         }
     }
 }
+}
+
+/** Соединённый список Material 3 Expressive: у группы крупные внешние углы, между строками — маленькие. */
+internal fun groupShape(index: Int, count: Int): androidx.compose.ui.graphics.Shape {
+    val big = 24.dp; val small = 6.dp
+    return androidx.compose.foundation.shape.RoundedCornerShape(
+        topStart = if (index == 0) big else small, topEnd = if (index == 0) big else small,
+        bottomStart = if (index == count - 1) big else small, bottomEnd = if (index == count - 1) big else small,
+    )
+}
+
+private fun icon(name: String, path: String) = androidx.compose.ui.graphics.vector.ImageVector.Builder(name, 24.dp, 24.dp, 24f, 24f)
+    .addPath(androidx.compose.ui.graphics.vector.PathParser().parsePathString(path).toNodes(),
+        fill = androidx.compose.ui.graphics.SolidColor(androidx.compose.ui.graphics.Color.Black))
+    .build()
+
+/** Material Symbols (Apache-2.0). */
+internal val BackIcon by lazy { icon("back", "M20,11H7.83l5.59,-5.59L12,4l-8,8 8,8 1.41,-1.41L7.83,13H20v-2z") }
+internal val ChevronIcon by lazy { icon("chevron", "M10,6L8.59,7.41 13.17,12l-4.58,4.59L10,18l6,-6z") }

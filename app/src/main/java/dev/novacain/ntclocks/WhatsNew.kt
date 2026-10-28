@@ -76,7 +76,7 @@ object WhatsNewState {
 @Composable
 fun WhatsNewScreen(firstRun: Boolean, version: String, onDone: () -> Unit) = AppearScope("news") {
     Column(
-        Modifier.fillMaxSize().background(Color(0xF70A0A0D)).statusBarsPadding().navigationBarsPadding().padding(horizontal = 24.dp),
+        Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.surface.copy(alpha = 0.97f)).statusBarsPadding().navigationBarsPadding().padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(40.dp))
@@ -94,7 +94,7 @@ fun WhatsNewScreen(firstRun: Boolean, version: String, onDone: () -> Unit) = App
                 NEWS.forEach { n ->
                     Appear {
                         Row(Modifier.fillMaxWidth().padding(vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.size(46.dp).clip(RoundedCornerShape(15.dp)).background(Surface2).border(1.dp, Line, RoundedCornerShape(15.dp)),
+                            Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer),
                                 contentAlignment = Alignment.Center) { NewsGlyph(n.icon, Modifier.size(24.dp)) }
                             Spacer(Modifier.width(14.dp))
                             Column(Modifier.weight(1f)) {
@@ -106,16 +106,20 @@ fun WhatsNewScreen(firstRun: Boolean, version: String, onDone: () -> Unit) = App
                 }
             }
         }
-        Box(Modifier.fillMaxWidth().padding(vertical = 18.dp).height(60.dp).clip(CircleShape).background(Color.White).clickable(onClick = onDone),
-            contentAlignment = Alignment.Center) { Text(s(R.string.action_continue), style = t(18, FontWeight.SemiBold, Color.Black)) }
+        @OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
+        androidx.compose.material3.Button(onClick = onDone, shapes = androidx.compose.material3.ButtonDefaults.shapes(),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 18.dp).height(60.dp)) {
+            Text(s(R.string.action_continue), style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+        }
     }
 }
 
 @Composable
 private fun NewsGlyph(icon: NewsIcon, modifier: Modifier) {
+    val tint = androidx.compose.material3.MaterialTheme.colorScheme.onSecondaryContainer
     Canvas(modifier) {
         val w = size.width; val h = size.height
-        val c = Color.White
+        val c = tint
         val st = Stroke(w * 0.09f, cap = StrokeCap.Round)
         when (icon) {
             NewsIcon.Motion -> {                     // окно вылетает из точки

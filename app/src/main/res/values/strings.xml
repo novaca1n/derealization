@@ -76,7 +76,7 @@
     <string name="clock_as_aod">As in Always-on</string>
     <string name="clock_tab_choose">Choose</string>
     <string name="clock_tab_adjust">Adjust</string>
-    <string name="clock_font_label">FONT</string>
+    <string name="clock_font_label">Font</string>
     <string name="clock_applied">On the lock screen</string>
     <string name="clock_apply">Set on the lock screen</string>
     <string name="clock_grant_hint">To let the app change the clock, grant access once:\nadb shell pm grant dev.novacain.ntclocks android.permission.WRITE_SECURE_SETTINGS</string>
@@ -347,4 +347,5 @@
     <string name="unlock_distance">How far it slides</string>
     <string name="tile_brightness">Brightness</string>
     <string name="tile_volume">Volume</string>
+    <string name="action_back">Back</string>
 </resources>
