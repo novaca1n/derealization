@@ -8,7 +8,8 @@ plugins {
 // Release key lives outside the repo (../keys/keystore.properties or $RELEASE_KEYS); without it release builds
 // are signed with the debug key, which is fine for local builds.
 val keyProps = Properties().apply {
-    val f = file(System.getenv("RELEASE_KEYS") ?: "${rootDir}/../keys/keystore.properties")
+    val keysPath = System.getenv("RELEASE_KEYS")
+    val f = if (keysPath != null && keysPath.isNotBlank()) file(keysPath) else file("${rootDir}/../keys/keystore.properties")
     if (f.exists()) f.reader(Charsets.UTF_8).use { load(it) }   // UTF-8: the path may be non-ASCII
 }
 
