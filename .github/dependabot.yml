@@ -1,0 +1,28 @@
+version: 2
+updates:
+  # Gradle wrapper
+  - package-ecosystem: 'gradle'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '06:00'
+    open-pull-requests-limit: 5
+    labels:
+      - 'dependencies'
+      - 'gradle'
+
+  # GitHub Actions
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '06:00'
+    open-pull-requests-limit: 5
+    labels:
+      - 'dependencies'
+      - 'github-actions'
+
+  # Gradle plugins (via gradle-version-catalog if used, or just gradle)
+  # Note: plugins in build.gradle.kts are managed by gradle
