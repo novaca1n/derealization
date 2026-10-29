@@ -87,6 +87,8 @@ jobs:
         run: ./build.sh assembleRelease
         env:
           RELEASE_KEYS: ${{ secrets.RELEASE_KEYS_PATH }}
+        # Only set RELEASE_KEYS if the secret is defined
+        # If not defined, gradle will fall back to ../keys/keystore.properties or debug key
 
       - name: Find APKs
         id: find-apks
