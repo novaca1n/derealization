@@ -3,7 +3,6 @@ name: Build derealization
 on:
   push:
     branches: [main, master]
-    tags: ['v*']
   pull_request:
     branches: [main, master]
   workflow_dispatch:
@@ -52,6 +51,8 @@ jobs:
           ndk-version: 'r27c'
           cmdline-tools-version: 'latest'
           caches: 'android-sdk'
+          # Pre-accept all licenses to avoid interactive prompts
+          license-accept: 'all'
 
       - name: Cache Gradle wrapper
         uses: actions/cache@v4
@@ -151,6 +152,7 @@ jobs:
           ndk-version: 'r27c'
           cmdline-tools-version: 'latest'
           caches: 'android-sdk'
+          license-accept: 'all'
 
       - name: Make gradlew executable
         run: chmod +x gradlew
