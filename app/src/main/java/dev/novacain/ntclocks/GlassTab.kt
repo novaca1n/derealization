@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
-/** Модуль Magisk, который включает размытие окон в SurfaceFlinger (на CMF Phone 2 Pro Nothing его выключила). */
+/** Модуль Magisk, который включает размытие окон в SurfaceFlinger (Nothing отключает его на некоторых устройствах). */
 private const val BLUR_MODULE = "/data/adb/modules/ntweaker_blur"
 
 private fun su(cmd: String): Pair<Boolean, String> = runCatching {

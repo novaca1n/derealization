@@ -2,6 +2,7 @@ package dev.novacain.ntclocks
 
 import android.content.Context
 import kotlinx.coroutines.delay
+import kotlin.text.Regex
 
 /**
  * derealization — патчер. «Патч» по-настоящему внедряет код в системные процессы через Vector (форк LSPosed):
@@ -35,15 +36,26 @@ internal object Patcher {
     }
 
     /**
-     * Совместимость: сборка Nothing OS и версии лаунчера и «Обоев», на которых derealization проверен. Другая — Nothing
-     * обновила систему, часть твиков может не встать. null — всё как было.
+     * Совместимость: версия Nothing OS и версии лаунчера/обоев, на которых derealization проверен.
+     * Другая — Nothing обновила систему, часть твиков может не встать. null — всё как было.
      */
-    private const val TESTED_BUILD = "B4.1-260812"
+    private const val TESTED_OS_VERSION = "4.1"
     private val TESTED = mapOf("com.nothing.launcher" to 40020116L, "com.nothing.wallpaper" to 1082400L)
 
     fun compatibility(ctx: Context): String? {
         val changed = mutableListOf<String>()
-        if (!android.os.Build.DISPLAY.startsWith(TESTED_BUILD)) changed += "Nothing OS ${android.os.Build.DISPLAY}"
+        val display = android.os.Build.DISPLAY
+        // Check if it's Nothing OS 4.1 or higher
+        val osVersion = Regex("""Nothing OS\s+(\d+\.\d+)""").find(display)?.groupValues?.get(1)
+        if (osVersion != null) {
+            val versionParts = osVersion.split(".").map { it.toIntOrNull() ?: 0 }
+            val testedParts = TESTED_OS_VERSION.split(".").map { it.toIntOrNull() ?: 0 }
+            val isOlder = versionParts.size >= 2 && testedParts.size >= 2 &&
+                (versionParts[0] < testedParts[0] || (versionParts[0] == testedParts[0] && versionParts[1] < testedParts[1]))
+            if (isOlder) changed += "Nothing OS $osVersion (below tested $TESTED_OS_VERSION)"
+        } else if (!display.startsWith("B")) {
+            changed += "Nothing OS ${display}"
+        }
         for ((pkg, code) in TESTED) {
             val v = runCatching { ctx.packageManager.getPackageInfo(pkg, 0).longVersionCode }.getOrNull() ?: continue
             if (v != code) changed += NAMES[pkg] ?: pkg

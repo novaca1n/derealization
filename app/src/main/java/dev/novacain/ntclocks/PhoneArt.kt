@@ -21,11 +21,16 @@ import androidx.compose.ui.graphics.graphicsLayer
 import kotlin.math.sin
 
 /** Какой телефон рисовать: по ro.product.device. */
-enum class Phone { CmfPhone2Pro, NothingPhone3, Other }
+enum class Phone { CmfPhone2Pro, CmfPhone1, NothingPhone3, NothingPhone3aLite, NothingPhone2, NothingPhone1, NothingPhone2a, Other }
 
 fun currentPhone(): Phone = when (Build.DEVICE.lowercase()) {
     "galaga" -> Phone.CmfPhone2Pro
+    "tetris" -> Phone.CmfPhone1
     "metroid" -> Phone.NothingPhone3
+    "galaxian" -> Phone.NothingPhone3aLite
+    "pong" -> Phone.NothingPhone2
+    "spacewar" -> Phone.NothingPhone1
+    "pacman" -> Phone.NothingPhone2a
     else -> Phone.Other
 }
 
@@ -79,12 +84,43 @@ private class Kit(val d: DrawScope) {
                 dotB(cut, 0.82f, 0.915f, 0.11f)                   // винт CMF — тёмное кольцо
                 dotB(body, 0.82f, 0.915f, 0.065f)
             }
+            Phone.CmfPhone1 -> {
+                dotB(cut, 0.18f, 0.07f, 0.13f)
+                dotB(cut, 0.18f, 0.2f, 0.13f)
+                dotB(cut, 0.43f, 0.105f, 0.08f)
+                // CMF Phone 1 has similar design but no screw at bottom
+            }
             Phone.NothingPhone3 -> {
                 dotB(cut, 0.15f, 0.07f, 0.11f)
                 dotB(cut, 0.18f, 0.24f, 0.13f)
                 dotB(cut, 0.48f, 0.24f, 0.13f)
                 dotB(cut, 0.8f, 0.08f, 0.13f)                     // Glyph Matrix — тёмный круг с точками
                 for ((u, v) in listOf(0.76f to 0.065f, 0.84f to 0.065f, 0.8f to 0.095f)) dotB(body, u, v, 0.022f)
+            }
+            Phone.NothingPhone3aLite -> {
+                dotB(cut, 0.15f, 0.07f, 0.11f)
+                dotB(cut, 0.18f, 0.24f, 0.13f)
+                // 3a Lite has smaller glyph area, two cameras
+            }
+            Phone.NothingPhone2 -> {
+                dotB(cut, 0.15f, 0.07f, 0.11f)
+                dotB(cut, 0.18f, 0.24f, 0.13f)
+                dotB(cut, 0.48f, 0.24f, 0.13f)
+                dotB(cut, 0.8f, 0.08f, 0.13f)                     // Glyph Matrix
+                for ((u, v) in listOf(0.76f to 0.065f, 0.84f to 0.065f, 0.8f to 0.095f)) dotB(body, u, v, 0.022f)
+            }
+            Phone.NothingPhone1 -> {
+                dotB(cut, 0.15f, 0.07f, 0.11f)
+                dotB(cut, 0.18f, 0.24f, 0.13f)
+                dotB(cut, 0.48f, 0.24f, 0.13f)
+                dotB(cut, 0.8f, 0.08f, 0.13f)                     // Glyph Matrix
+                for ((u, v) in listOf(0.76f to 0.065f, 0.84f to 0.065f, 0.8f to 0.095f)) dotB(body, u, v, 0.022f)
+            }
+            Phone.NothingPhone2a -> {
+                dotB(cut, 0.15f, 0.07f, 0.11f)
+                dotB(cut, 0.18f, 0.24f, 0.13f)
+                dotB(cut, 0.48f, 0.24f, 0.13f)
+                // 2a has simpler glyph, two cameras
             }
             Phone.Other -> dotB(cut, 0.2f, 0.08f, 0.12f)
         }

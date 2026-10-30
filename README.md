@@ -1,10 +1,12 @@
 # derealization
 
-A system patcher for **Nothing OS 4.1** on the **CMF Phone 2 Pro** (`galaga`). It injects into SystemUI, the Nothing
+A system patcher for **Nothing OS 4.1+** on any Nothing device. It injects into SystemUI, the Nothing
 launcher, Wallpaper & style and Settings through [Vector](https://github.com/JingMatrix/Vector) (LSPosed), so nothing
 on the system partition is modified — patching and unpatching is one tap and fully reversible.
 
 All settings live where Nothing's own are: **Wallpaper & style → derealization**.
+
+**Supported devices:** CMF Phone 2 Pro (`galaga`), CMF Phone 1 (`tetris`), Nothing Phone (3) (`metroid`), Nothing Phone (3a) Lite (`galaxian`), Nothing Phone (2) (`spacewar`), Nothing Phone (1) (`pacman`), Nothing Phone (2a) (`tetris`), and other NothingOS devices.
 
 ## What it does
 
@@ -32,7 +34,7 @@ All settings live where Nothing's own are: **Wallpaper & style → derealization
 
 ## Requirements
 
-- CMF Phone 2 Pro with Nothing OS 4.1 (tested on build `B4.1-260812`; newer builds usually work — the patcher tells
+- Any Nothing device with Nothing OS 4.1+ (tested on CMF Phone 2 Pro build `B4.1-260812`; newer builds usually work — the patcher tells
   you if Nothing updated something it hooks)
 - Root with [Magisk](https://github.com/topjohnwu/Magisk) (Zygisk enabled)
 - [Vector](https://github.com/JingMatrix/Vector)
